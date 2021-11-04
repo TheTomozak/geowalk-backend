@@ -39,6 +39,12 @@ public class BlogPost extends EntityBase {
     @OneToMany(mappedBy = "blogPost", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private List<Image> images = new ArrayList<>();
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.PERSIST})
+    @JoinTable(name = "blog_posts_tags",
+            joinColumns = {@JoinColumn(name = "blog_post_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")})
+    private List<Tag> tags = new ArrayList<>();
+
     public BlogPost() {
     }
 
@@ -104,5 +110,17 @@ public class BlogPost extends EntityBase {
 
     public void setImages(List<Image> images) {
         this.images = images;
+    }
+
+    public void setCreationDateTime(LocalDateTime creationDateTime) {
+        this.creationDateTime = creationDateTime;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }
