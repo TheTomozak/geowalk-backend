@@ -16,7 +16,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepo userRepo;
-    private ModelMapper mapper = new ModelMapper;
+    private ModelMapper mapper = new ModelMapper();
 
     @Autowired
     public UserService(UserRepo userRepo) {

@@ -33,3 +33,4 @@ build/
 .vscode/
 
 baza.mv.db
+baza.trace.db
