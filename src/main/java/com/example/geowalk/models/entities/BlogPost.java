@@ -14,7 +14,7 @@ public class BlogPost extends EntityBase {
     @Column(nullable = false)
     private LocalDateTime creationDateTime = LocalDateTime.now();
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime lastEditDateTime;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
