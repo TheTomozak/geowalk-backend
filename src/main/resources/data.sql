@@ -15,7 +15,7 @@ insert into travel_route (name, difficulty, description) values
 
 insert into blog_post (content, creation_date_time, last_edit_date_time, user_id) values
     ('Przechadzka po Warszawie. Nauka-zakupy-spacer', '2021-10-09', null, 3),
-    ('Wszedzie lepiej gdzie nas nie ma, GeaWalk!', '2021-10-09', null, 2);
+    ('Ciekawa i historyczna wycieczka po Zamku.', '2021-10-09', null, 2);
 
 insert into blog_comment(content, creation_date_time, rating, user_id) values
     ('Ciekawa trasa!','2021-10-10', 4, 1),
@@ -23,9 +23,18 @@ insert into blog_comment(content, creation_date_time, rating, user_id) values
     ('Malo zieleni, trasa bez rewelacji', '2021-10-22', 1, 1),
     ('Calkiem fajna :)',' 2021-10-10', 4, 2);
 
-insert into tag(name) into
+insert into tag(name) values
+    ('Warszawa'),
+    ('Wycieczka'),
+    ('Ciekawa'),
+    ('Zamki');
 
 
+insert into BLOG_POSTS_TAGS(TAG_ID, BLOG_POST_ID) values
+    (1, 1),
+    (2, 1),
+    (3, 1),
+    (4, 2);
 
 insert into travel_stop_travel_route(TRAVEL_STOP_ID, TRAVEL_ROUTE_ID) values
     (1, 1),
