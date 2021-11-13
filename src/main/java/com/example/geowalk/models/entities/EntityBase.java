@@ -10,7 +10,18 @@ public abstract class EntityBase {
     @Column(unique = true, nullable = false)
     private Long id;
 
+    @Column(nullable = false)
+    private boolean isVisible = true;
+
     public Long getId() {
         return id;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
     }
 }
