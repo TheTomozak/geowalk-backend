@@ -1,32 +1,20 @@
-package com.example.geowalk.models.dto.responses;
+package com.example.geowalk.models.dto.requests;
 
-import com.example.geowalk.models.enums.Role;
+public class UserReqDto {
 
-public class UserResDto {
-    private long id;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
-    private Role role;
 
-    public UserResDto() {
+    public UserReqDto() {
     }
 
-    public UserResDto(String firstName, String lastName, String email, String password, Role role) {
+    public UserReqDto(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.role = role;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getFirstName() {
@@ -59,13 +47,5 @@ public class UserResDto {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 }

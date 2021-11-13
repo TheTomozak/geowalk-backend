@@ -1,11 +1,10 @@
 package com.example.geowalk.controllers;
 
+import com.example.geowalk.models.dto.requests.UserReqDto;
 import com.example.geowalk.models.dto.responses.UserResDto;
 import com.example.geowalk.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,5 +22,30 @@ public class UserController {
     @GetMapping
     public List<UserResDto> getUsers() {
         return userService.getUsers();
+    }
+
+    @GetMapping("/{userId}")
+    public UserResDto getUser(@PathVariable("userId") long userId) {
+        return userService.getUser(userId);
+    }
+
+    @PostMapping
+    public void createUser(@RequestBody UserReqDto request) {
+        userService.createUser(request);
+    }
+
+    @PutMapping("/{userId}")
+    public void updateUser(@PathVariable("userId") long userId, @RequestBody UserReqDto request) {
+        userService.updateUser(userId, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable long id) {
+        userService.deleteUser(id);
+    }
+
+    @PostMapping("/emailCheck")
+    public boolean isEmailUnique(@RequestBody String email) {
+        return userService.isEmailUnique(email);
     }
 }
