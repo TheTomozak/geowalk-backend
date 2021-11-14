@@ -34,6 +34,7 @@ insert into BLOG_POSTS_TAGS(TAG_ID, BLOG_POST_ID) values
     (1, 1),
     (2, 1),
     (3, 1),
+    (2, 2),
     (4, 2);
 
 insert into travel_stop_travel_route(TRAVEL_STOP_ID, TRAVEL_ROUTE_ID) values
