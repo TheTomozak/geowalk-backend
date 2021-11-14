@@ -2,6 +2,7 @@ package com.example.geowalk.services;
 
 
 import com.example.geowalk.exceptions.NotFoundTravelRouteException;
+import com.example.geowalk.exceptions.base.NotFoundException;
 import com.example.geowalk.models.dto.requests.TravelRouteRequest;
 import com.example.geowalk.models.entities.TravelRoute;
 import com.example.geowalk.models.repositories.TravelRouteRepo;
@@ -15,6 +16,8 @@ import java.util.List;
 public class TravelRouteService {
 
     private final TravelRouteRepo travelRouteRepository;
+    private final String TRAVEL_ROUTE_NOT_FOUND = "TravelRoute with given id not found";
+
 
     public TravelRouteService(TravelRouteRepo travelRouteRepository) {
         this.travelRouteRepository = travelRouteRepository;
@@ -26,9 +29,7 @@ public class TravelRouteService {
 
     public TravelRoute getTravelRouteById(Long TravelRouteId) throws NotFoundTravelRouteException {
         return travelRouteRepository.findById(TravelRouteId)
-                .orElseThrow(() ->
-                        new NotFoundTravelRouteException(String.format("Cannot find TravelRoute by id: %s", TravelRouteId))
-                );
+                .orElseThrow(() -> new NotFoundException(TRAVEL_ROUTE_NOT_FOUND));
     }
 
     public void createTravelRoute(TravelRouteRequest travelRouteRequest){
@@ -39,5 +40,4 @@ public class TravelRouteService {
         );
         travelRouteRepository.save(travelRoute);
     }
-
 }
