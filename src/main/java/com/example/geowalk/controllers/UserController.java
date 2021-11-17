@@ -3,6 +3,8 @@ package com.example.geowalk.controllers;
 import com.example.geowalk.models.dto.requests.UserReqDto;
 import com.example.geowalk.models.dto.responses.UserResDto;
 import com.example.geowalk.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +15,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     public UserController(UserService userService) {
@@ -26,22 +29,26 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public UserResDto getUser(@PathVariable("userId") long userId) {
+        logger.info("User with id: "+ userId +" has been shown");
         return userService.getUser(userId);
     }
 
     @PostMapping
     public void createUser(@RequestBody UserReqDto request) {
+        logger.info("User has been created");
         userService.createUser(request);
     }
 
     @PutMapping("/{userId}")
     public void updateUser(@PathVariable("userId") long userId, @RequestBody UserReqDto request) {
+        logger.info("User with id: "+ userId +" has been updated");
         userService.updateUser(userId, request);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable long id) {
-        userService.deleteUser(id);
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable long userId) {
+        logger.info("User with id: "+ userId +" has been deleted");
+        userService.deleteUser(userId);
     }
 
     @PostMapping("/emailCheck")
