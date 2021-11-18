@@ -51,6 +51,13 @@ public class UserService {
         return mapper.map(user.get(), UserResDto.class);
     }
 
+    public UserResDto getUser(String email) {
+        User user = userRepo.findByEmailAndVisibleIsTrue(email)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+
+        return mapper.map(user, UserResDto.class);
+    }
+
     public void createUser(UserReqDto request) {
         if(!isEmailUnique(request.getEmail())) {
             throw new NotAcceptableException(EMAIL_ALREADY_IN_USE);

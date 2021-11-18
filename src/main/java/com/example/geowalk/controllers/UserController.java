@@ -33,6 +33,14 @@ public class UserController {
         return userService.getUser(userId);
     }
 
+    @GetMapping("/{email}")
+    public UserResDto getUser(@PathVariable("email") String email) {
+        logger.info("User with mail: "+ email +" has been shown");
+        return userService.getUser(email);
+    }
+
+
+
     @PostMapping
     public void createUser(@RequestBody UserReqDto request) {
         logger.info("User has been created");
