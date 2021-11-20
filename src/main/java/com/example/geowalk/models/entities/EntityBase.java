@@ -11,17 +11,17 @@ public abstract class EntityBase {
     private Long id;
 
     @Column(nullable = false)
-    private boolean isVisible = true;
+    private boolean visible = true;
 
     public Long getId() {
         return id;
     }
 
     public boolean isVisible() {
-        return isVisible;
+        return visible;
     }
 
     public void setVisible(boolean visible) {
-        isVisible = visible;
+        visible = visible;
     }
 }

@@ -1,4 +1,4 @@
-insert into user (first_name, last_name, email, password, role, is_visible) values
+insert into user (first_name, last_name, email, password, role, visible) values
     ('Adam', 'Kowalski', 'adam@gmail.com', 'password', 'ADMIN', true),              --1
     ('Paweł', 'Brawo', 'pawel@gmail.com', 'password', 'ADMIN', true),               --2
 
@@ -10,7 +10,7 @@ insert into user (first_name, last_name, email, password, role, is_visible) valu
     ('Paulina', 'Pawłowicz', 'paulina@gmail.com', 'password', 'USER', true),        --7
     ('Mateusz', 'Ustew', 'mateusz@gmail.com', 'password', 'USER', true);            --8
 
-insert into travel_stop (name, latitude, longitude, is_visible) values
+insert into travel_stop (name, latitude, longitude, visible) values
     ('PJATK', '52.223941713710204', '20.99456713842226', true),                                      --1
     ('Galeria mokotów', '52.17986650656597', '21.004595882599652', true),                            --2
     ('Stacja Grawitacja', '52.21286546599547', '20.96246636355756', true),                           --3
@@ -34,13 +34,13 @@ insert into travel_stop (name, latitude, longitude, is_visible) values
 
     ('Cowboys Casino', '51.0438273528732', '-114.04098858356981', true);                    --17
 
-insert into travel_route (name, difficulty, description, is_visible) values
+insert into travel_route (name, difficulty, description, visible) values
     ('Wycieczka po Warszawie', 'MEDIUM', 'Trasa dla osób odwiedzających Warszawe', true),   --1
     ('Watykan za dnia', 'HARD', 'Swiete miejsca w Watykanie', true),                        --2
     ('Egipt', 'EASY', 'Latwa trasa po Egipcie, autokarem', true),                           --3
     ('Amerykanski Sen', 'HARD', 'Zwiedzanie LA w USA!', true);                              --4
 
-insert into blog_post (content, creation_date_time, last_edit_date_time, user_id, is_visible) values
+insert into blog_post (content, creation_date_time, last_edit_date_time, user_id, visible) values
     ('Przechadzka po Warszawie. Nauka-zakupy-spacer', '2021-08-09', null, 4, true),                                 --1
     ('Ciekawa i historyczna wycieczka po Zamku.', '2021-08-15', null, 3, true),                                     --2
     ('Dzisiaj byłem w Watykanie. Swietne miejsce, daje dużo do myślenia!', '2021-07-15', null, 1, true),            --3
@@ -48,7 +48,7 @@ insert into blog_post (content, creation_date_time, last_edit_date_time, user_id
     ('Bardzo Amerykanskie i bardzo ciekawe przystanki. Zachecam do czytania dalej.', '2021-06-09', null, 3, true),  --5
     ('Kasyno w kozackim stylu.', '2021-08-10', null, 4, true);                                                      --6
 
-insert into blog_comment(content, creation_date_time, rating, user_id, is_visible, blog_post_id) values
+insert into blog_comment(content, creation_date_time, rating, user_id, visible, blog_post_id) values
     ('Ciekawa trasa!','2021-09-15', 4, 1, true, 1),                        --1
     ('Duzo atrakcji, a trampoliny - SUPER', '2021-11-10', 5, 2, true, 2),  --2
     ('Malo zieleni, trasa bez rewelacji', '2021-10-22', 1, 3, true, 3),    --3
@@ -89,7 +89,7 @@ insert into blog_comment(content, creation_date_time, rating, user_id, is_visibl
     ('Z artykulu mozna wyczytac ze warto przyjechac. Bilety juz kupione.', '2021-10-02', 5, 8, true,6);   --32
 
 
-insert into tag(name, is_visible) values
+insert into tag(name, visible) values
     ('Wycieczka', true),        --1
     ('Ciekawa', true),          --2
     ('Krajoznawcze', true),     --3
