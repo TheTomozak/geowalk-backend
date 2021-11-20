@@ -3,6 +3,7 @@ package com.example.geowalk.services;
 import com.example.geowalk.exceptions.base.NotAcceptableException;
 import com.example.geowalk.exceptions.base.NotFoundException;
 import com.example.geowalk.models.dto.requests.UserReqDto;
+import com.example.geowalk.models.dto.responses.UserResDto;
 import com.example.geowalk.models.entities.User;
 import com.example.geowalk.models.repositories.UserRepo;
 import org.modelmapper.ModelMapper;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,18 +29,33 @@ public class UserService {
         this.userRepo = userRepo;
     }
 
-    public List<User> getUsers() {
-        return userRepo.findAllByVisibleIsTrue();
+    public List<UserResDto> getUsers() {
+        List<UserResDto> result = new ArrayList<>();
+        for (User user : userRepo.findAll()) {
+            if(user.isVisible()) {
+                result.add(mapper.map(user, UserResDto.class));
+            }
+        }
+        return result;
     }
 
-    public User getUser(Long userId) {
-        return userRepo.findByIdAndVisibleIsTrue(userId)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+    public UserResDto getUser(long userId) {
+        Optional<User> user = userRepo.findById(userId);
+        if(user.isEmpty()) {
+            throw new NotFoundException(USER_NOT_FOUND);
+        }
+        if(!user.get().isVisible()) {
+            throw new NotFoundException(USER_NOT_FOUND);
+        }
+
+        return mapper.map(user.get(), UserResDto.class);
     }
 
-    public User getUser(String email) {
-        return userRepo.findByEmailAndVisibleIsTrue(email.trim())
+    public UserResDto getUser(String email) {
+        User user = userRepo.findByEmailAndVisibleIsTrue(email)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+
+        return mapper.map(user, UserResDto.class);
     }
 
     public void createUser(UserReqDto request) {
@@ -50,15 +67,25 @@ public class UserService {
     }
 
     public void updateUser(long userId, UserReqDto request) {
-        User user = getUser(userId);
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        Optional<User> user = userRepo.findById(userId);
+        if(user.isEmpty()) {
+            throw new NotFoundException(USER_NOT_FOUND);
+        }
+        if(!isEmailUnique(request.getEmail())) {
+            throw new NotAcceptableException(EMAIL_ALREADY_IN_USE);
+        }
+        user.get().setFirstName(request.getFirstName());
+        user.get().setLastName(request.getLastName());
+        user.get().setEmail(request.getEmail());
+        user.get().setPassword(request.getPassword());
     }
 
-    public void deleteUser(long userId) {
-        getUser(userId).setVisible(false);
+    public void deleteUser(long id) {
+        Optional<User> user = userRepo.findById(id);
+        if(user.isEmpty()) {
+            throw new NotFoundException(USER_NOT_FOUND);
+        }
+        user.get().setVisible(false);
     }
 
     public boolean isEmailUnique(String email) {

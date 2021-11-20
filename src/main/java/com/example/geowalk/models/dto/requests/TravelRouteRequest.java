@@ -6,7 +6,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 public class TravelRouteRequest {
     @NotBlank
@@ -15,9 +14,6 @@ public class TravelRouteRequest {
     @NotNull
     @Enumerated(EnumType.STRING)
     private RouteDifficulty difficulty;
-
-    @NotNull
-    private Set<TravelStopRequest> travelStopList;
 
     @NotBlank
     private String description;
@@ -44,13 +40,5 @@ public class TravelRouteRequest {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Set<TravelStopRequest> getTravelStopList() {
-        return travelStopList;
-    }
-
-    public void setTravelStopList(Set<TravelStopRequest> travelStopList) {
-        this.travelStopList = travelStopList;
     }
 }
