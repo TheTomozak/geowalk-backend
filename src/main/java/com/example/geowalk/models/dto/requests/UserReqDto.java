@@ -34,7 +34,7 @@ public class UserReqDto {
     }
 
     public String getEmail() {
-        return email;
+        return email.trim();
     }
 
     public void setEmail(String email) {
