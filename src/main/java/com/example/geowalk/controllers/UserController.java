@@ -1,8 +1,10 @@
 package com.example.geowalk.controllers;
 
+import com.example.geowalk.models.dto.ObjectMapperUtils;
 import com.example.geowalk.models.dto.requests.UserReqDto;
 import com.example.geowalk.models.dto.responses.UserResDto;
 import com.example.geowalk.services.UserService;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/users")
 public class UserController {
+    private ModelMapper mapper = new ModelMapper();
 
     private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -24,22 +27,20 @@ public class UserController {
 
     @GetMapping
     public List<UserResDto> getUsers() {
-        return userService.getUsers();
+        return ObjectMapperUtils.mapAll(userService.getUsers(), UserResDto.class);
     }
 
     @GetMapping("/{userId}")
     public UserResDto getUser(@PathVariable("userId") long userId) {
         logger.info("User with id: "+ userId +" has been shown");
-        return userService.getUser(userId);
+        return mapper.map(userService.getUser(userId), UserResDto.class);
     }
 
     @GetMapping("/{email}")
     public UserResDto getUser(@PathVariable("email") String email) {
         logger.info("User with mail: "+ email +" has been shown");
-        return userService.getUser(email);
+        return mapper.map(userService.getUser(email), UserResDto.class);
     }
-
-
 
     @PostMapping
     public void createUser(@RequestBody UserReqDto request) {
