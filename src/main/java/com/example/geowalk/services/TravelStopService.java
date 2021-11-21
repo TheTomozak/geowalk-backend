@@ -1,6 +1,6 @@
 package com.example.geowalk.services;
 
-import com.example.geowalk.exceptions.NotFoundTravelStopException;
+import com.example.geowalk.exceptions.base.NotFoundException;
 import com.example.geowalk.models.dto.requests.TravelStopRequest;
 import com.example.geowalk.models.entities.TravelStop;
 import com.example.geowalk.models.repositories.TravelStopRepo;
@@ -15,6 +15,8 @@ public class TravelStopService {
 
     private final TravelStopRepo travelStopRepository;
 
+    private final String NOT_FOUND_BLOG_POST = "Travel stop with given id not found";
+
     public TravelStopService(TravelStopRepo travelStopRepository) {
         this.travelStopRepository = travelStopRepository;
     }
@@ -23,11 +25,14 @@ public class TravelStopService {
         return travelStopRepository.findAll();
     }
 
-    public TravelStop getTravelStopById(Long travelStopId) throws NotFoundTravelStopException {
+    public TravelStop getTravelStopByName(String name){
+        return travelStopRepository.findByName(name)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_BLOG_POST));
+    }
+
+    public TravelStop getTravelStopById(Long travelStopId) {
         return travelStopRepository.findById(travelStopId)
-                .orElseThrow(() ->
-                        new NotFoundTravelStopException(String.format("Cannot find travelStop by id: %s", travelStopId))
-                );
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_BLOG_POST));
     }
 
     public void createTravelStop(TravelStopRequest travelStopRequest){

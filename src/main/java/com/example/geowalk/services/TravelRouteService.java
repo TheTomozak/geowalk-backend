@@ -1,7 +1,5 @@
 package com.example.geowalk.services;
 
-
-import com.example.geowalk.exceptions.NotFoundTravelRouteException;
 import com.example.geowalk.exceptions.base.NotFoundException;
 import com.example.geowalk.models.dto.requests.TravelRouteRequest;
 import com.example.geowalk.models.entities.TravelRoute;
@@ -27,7 +25,7 @@ public class TravelRouteService {
         return travelRouteRepository.findAll();
     }
 
-    public TravelRoute getTravelRouteById(Long TravelRouteId) throws NotFoundTravelRouteException {
+    public TravelRoute getTravelRouteById(Long TravelRouteId) {
         return travelRouteRepository.findById(TravelRouteId)
                 .orElseThrow(() -> new NotFoundException(TRAVEL_ROUTE_NOT_FOUND));
     }
