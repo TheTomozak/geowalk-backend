@@ -2,6 +2,7 @@ package com.example.geowalk.models.dto.requests;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class BlogPostRequest {
 
@@ -11,9 +12,9 @@ public class BlogPostRequest {
     @NotNull
     private Long userId;
 
-    private TravelRouteRequest travelRouteRequest;
+    private List<TravelRouteRequest> travelRouteRequest;
 
-    private TravelStopRequest travelStopRequest;
+    private List<TravelStopRequest> travelStopRequest;
 
 
 
@@ -33,19 +34,19 @@ public class BlogPostRequest {
         this.userId = userId;
     }
 
-    public TravelRouteRequest getTravelRouteRequest() {
+    public List<TravelRouteRequest> getTravelRouteRequest() {
         return travelRouteRequest;
     }
 
-    public void setTravelRouteRequest(TravelRouteRequest travelRouteRequest) {
+    public void setTravelRouteRequest(List<TravelRouteRequest> travelRouteRequest) {
         this.travelRouteRequest = travelRouteRequest;
     }
 
-    public TravelStopRequest getTravelStopRequest() {
+    public List<TravelStopRequest> getTravelStopRequest() {
         return travelStopRequest;
     }
 
-    public void setTravelStopRequest(TravelStopRequest travelStopRequest) {
+    public void setTravelStopRequest(List<TravelStopRequest> travelStopRequest) {
         this.travelStopRequest = travelStopRequest;
     }
 }

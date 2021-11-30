@@ -2,12 +2,13 @@ package com.example.geowalk.services;
 
 import com.example.geowalk.exceptions.base.BadRequestException;
 import com.example.geowalk.exceptions.base.NotFoundException;
+import com.example.geowalk.models.dto.ObjectMapperUtils;
 import com.example.geowalk.models.dto.requests.BlogPostRequest;
+import com.example.geowalk.models.dto.responses.BlogPostResponse;
 import com.example.geowalk.models.entities.BlogPost;
 import com.example.geowalk.models.entities.TravelStop;
 import com.example.geowalk.models.entities.User;
 import com.example.geowalk.models.repositories.BlogPostRepo;
-import com.example.geowalk.models.repositories.UserRepo;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -24,14 +25,16 @@ public class BlogPostService {
     private final BlogPostRepo blogPostRepository;
     private final UserService userService;
     private final TravelStopService travelStopService;
+    private final TravelRouteService travelRouteService;
 
     private final String NOT_FOUND_BLOG_POST = "Blog post with given id not found";
     private final String BAD_REQUEST_BLOG_POST = "Blog post request has bad body";
 
-    public BlogPostService(BlogPostRepo blogPostRepository, UserService userService, TravelStopService travelStopService) {
+    public BlogPostService(BlogPostRepo blogPostRepository, UserService userService, TravelStopService travelStopService, TravelRouteService travelRouteService) {
         this.blogPostRepository = blogPostRepository;
         this.userService = userService;
         this.travelStopService = travelStopService;
+        this.travelRouteService = travelRouteService;
     }
 
     public List<BlogPost> getAllBlogPost(){
@@ -43,7 +46,6 @@ public class BlogPostService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_BLOG_POST));
     }
 
-    // TODO:
     public void createBlogPost(BlogPostRequest blogPostRequest){
 
         User user = userService.getUser(blogPostRequest.getUserId());
@@ -57,27 +59,31 @@ public class BlogPostService {
         }
 
         if(blogPostRequest.getTravelRouteRequest() != null){
-            if(blogPostRequest.getTravelRouteRequest().getTravelStopList().size() < 2){
-                throw new BadRequestException(BAD_REQUEST_BLOG_POST);
-            }
-            // TODO: 07.11.2021 Dodanie TravelRoute.
+            blogPostRequest.getTravelRouteRequest().forEach(e-> {
+                if(e.getTravelStopList().size() < 2){
+                    throw new BadRequestException(BAD_REQUEST_BLOG_POST);
+                }
+                blogPost.getTravelRoutes().add(travelRouteService.createTravelRoute(e));
+            });
         }
-        else {
-            // TODO: 07.11.2021 Dodanie Travel Stopa
+        else if(blogPostRequest.getTravelStopRequest() != null){
+            blogPostRequest.getTravelStopRequest().forEach(e-> {
+                blogPost.getTravelStops().add(travelStopService.createTravelStop(e));
+            });
         }
         blogPostRepository.save(blogPost);
     }
 
-    public Set<BlogPost> findBlogPostByNameOfTravelStop(String locationName){
+    public Set<BlogPostResponse> findBlogPostAboutTravelStopByName(String locationName){
 
 //        List<TravelStop> travelStopList = travelStopService.getAllTravelStop()
 //                .stream().filter(e -> e.getName().equals(locationName)).collect(Collect
 
         TravelStop travelStop = travelStopService.getTravelStopByName(locationName);
-        return new HashSet<>(travelStop.getBlogPosts());
+        return new HashSet<>(ObjectMapperUtils.mapAll(new HashSet<>(travelStop.getBlogPosts()), BlogPostResponse.class));
     }
 
-    public Set<BlogPost> findAllBlogPostByLocationNameWithinTravelRoute(String locationName){
+    public Set<BlogPostResponse> findAllBlogPostAboutTravelRouteByTravelStopLocationName(String locationName){
 
 //        List<TravelStop> travelStopList = travelStopService.getAllTravelStop()
 //                .stream().filter(e -> e.getName().equals(locationName)).collect(Collect
@@ -88,6 +94,6 @@ public class BlogPostService {
         travelStop.getTravelRoutes().forEach(e -> blogPostList.addAll(e.getBlogPosts()));
         blogPostList.addAll(travelStop.getBlogPosts());
 
-        return new HashSet<>(blogPostList);
+        return new HashSet<>(ObjectMapperUtils.mapAll(new HashSet<>(blogPostList), BlogPostResponse.class));
     }
 }

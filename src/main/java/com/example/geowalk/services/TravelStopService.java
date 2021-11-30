@@ -35,12 +35,15 @@ public class TravelStopService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_BLOG_POST));
     }
 
-    public void createTravelStop(TravelStopRequest travelStopRequest){
+    public TravelStop createTravelStop(TravelStopRequest travelStopRequest){
         TravelStop travelStop = new TravelStop(
                 travelStopRequest.getName(),
                 travelStopRequest.getLatitude(),
-                travelStopRequest.getLongitude()
+                travelStopRequest.getLongitude(),
+                travelStopRequest.getCountry(),
+                travelStopRequest.getCity(),
+                travelStopRequest.getStreet()
         );
-        travelStopRepository.save(travelStop);
+        return travelStop;
     }
 }

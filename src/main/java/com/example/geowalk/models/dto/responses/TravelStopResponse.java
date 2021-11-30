@@ -1,27 +1,19 @@
-package com.example.geowalk.models.dto.requests;
+package com.example.geowalk.models.dto.responses;
 
 import javax.persistence.Column;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
-public class TravelStopRequest {
+public class TravelStopResponse {
 
-    @NotBlank
     private String name;
 
-    @NotNull
     private double latitude;
 
-    @NotNull
     private double longitude;
 
-    @NotBlank
     private String Country;
 
-    @NotBlank
     private String City;
 
-    @NotBlank
     private String Street;
 
     public String getName() {

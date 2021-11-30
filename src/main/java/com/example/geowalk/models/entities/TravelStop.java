@@ -16,6 +16,15 @@ public class TravelStop extends EntityBase {
     @Column(nullable = false)
     private double longitude;
 
+    @Column(nullable = false)
+    private String Country;
+
+    @Column(nullable = false)
+    private String City;
+
+    @Column(nullable = false)
+    private String Street;
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "blog_posts_travel_stop",
             joinColumns = {@JoinColumn(name = "travel_stop_id")},
@@ -31,10 +40,13 @@ public class TravelStop extends EntityBase {
     public TravelStop() {
     }
 
-    public TravelStop(String name, double latitude, double longitude) {
+    public TravelStop(String name, double latitude, double longitude, String country, String city, String street) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
+        Country = country;
+        City = city;
+        Street = street;
     }
 
     public String getName() {
@@ -75,5 +87,29 @@ public class TravelStop extends EntityBase {
 
     public void setTravelRoutes(List<TravelRoute> travelRoutes) {
         this.travelRoutes = travelRoutes;
+    }
+
+    public String getCountry() {
+        return Country;
+    }
+
+    public void setCountry(String country) {
+        Country = country;
+    }
+
+    public String getCity() {
+        return City;
+    }
+
+    public void setCity(String city) {
+        City = city;
+    }
+
+    public String getStreet() {
+        return Street;
+    }
+
+    public void setStreet(String street) {
+        Street = street;
     }
 }
