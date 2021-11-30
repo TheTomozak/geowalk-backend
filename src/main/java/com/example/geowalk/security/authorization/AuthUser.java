@@ -1,13 +1,13 @@
-package com.example.geowalk.security;
+package com.example.geowalk.security.authorization;
 
-public class LoginCredentials {
-
+public class AuthUser {
     private String username;
     private String password;
 
     public String getUsername() {
         return username;
     }
+
     public String getPassword() {
         return password;
     }

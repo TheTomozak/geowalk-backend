@@ -1,4 +1,4 @@
-package com.example.geowalk.security;
+package com.example.geowalk.security.authorization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-public class JsonObjectAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class AuthenticationWithJsonFilter extends UsernamePasswordAuthenticationFilter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -20,16 +20,14 @@ public class JsonObjectAuthenticationFilter extends UsernamePasswordAuthenticati
         try {
             BufferedReader reader = request.getReader();
             StringBuilder sb = new StringBuilder();
-            String line;
+            String line = "";
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
             }
-            LoginCredentials authRequest = objectMapper.readValue(sb.toString(), LoginCredentials.class);
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    authRequest.getUsername(), authRequest.getPassword()
-            );
+            AuthUser authRequest = objectMapper.readValue(sb.toString(), AuthUser.class);
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
             setDetails(request, token);
-            return this.getAuthenticationManager().authenticate(token);
+            return getAuthenticationManager().authenticate(token);
         } catch (IOException e) {
             throw new IllegalArgumentException(e.getMessage());
         }

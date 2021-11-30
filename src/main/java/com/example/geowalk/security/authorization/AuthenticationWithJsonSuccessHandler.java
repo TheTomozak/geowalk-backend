@@ -1,4 +1,4 @@
-package com.example.geowalk.security;
+package com.example.geowalk.security.authorization;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -10,10 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class AuthenticationWithJsonSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         clearAuthenticationAttributes(request);
     }
 }
