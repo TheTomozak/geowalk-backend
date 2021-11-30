@@ -20,4 +20,7 @@ public interface UserRepo extends JpaRepository<User, Long> {
     Optional<User> findByIdAndVisibleIsTrue(long userId);
 
     List<User> findAllByVisibleIsTrue();
+
+    @Query(value = "select * from user where email = :email", nativeQuery = true)
+    Optional<User> getUserByEmail(@Param("email") String email);
 }
