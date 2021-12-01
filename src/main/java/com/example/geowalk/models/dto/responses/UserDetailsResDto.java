@@ -2,17 +2,18 @@ package com.example.geowalk.models.dto.responses;
 
 import com.example.geowalk.models.enums.Role;
 
-public class UserResDto {
+public class UserDetailsResDto {
+
     private long id;
     private String firstName;
     private String lastName;
     private String email;
     private Role role;
 
-    public UserResDto() {
+    public UserDetailsResDto() {
     }
 
-    public UserResDto(String firstName, String lastName, String email, Role role) {
+    public UserDetailsResDto(String firstName, String lastName, String email, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

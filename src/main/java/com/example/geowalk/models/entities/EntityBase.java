@@ -25,6 +25,6 @@ public abstract class EntityBase {
     }
 
     public void setVisible(boolean visible) {
-        visible = visible;
+        this.visible = visible;
     }
 }
