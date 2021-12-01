@@ -1,8 +1,10 @@
 package com.example.geowalk.services;
 
+import com.example.geowalk.exceptions.BadRequestException;
 import com.example.geowalk.exceptions.ForbiddenException;
 import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.exceptions.UnauthorizedException;
+import com.example.geowalk.models.dto.requests.BlogCommentReqDto;
 import com.example.geowalk.models.dto.responses.BlogCommentResponse;
 import com.example.geowalk.models.dto.responses.UserResDto;
 import com.example.geowalk.models.entities.BlogComment;
@@ -18,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +37,13 @@ public class BlogCommentService {
     private final UserRepo userRepo;
     private ModelMapper mapper;
     private final ISessionUtil sessionUtil;
+
     private final String BLOG_COMMENT_NOT_FOUND = "Blog comment with given id not found";
     private final String USER_NOT_AUTHORIZED = "User is not authenticated";
     private final String USER_BLOCKED_OR_DELETED = "User is deleted/blocked";
     private final String COMMENT_NOT_WRITTEN_BY_THIS_USER = "User cannot delete comment others users";
     private final String BLOGPOST_NOT_FOUND = "BlogPost with given id not found";
+    private final String INVALID_RATING_VALUE = "Rating value is invalid";
 
     @Autowired
     public BlogCommentService(BlogCommentRepo blogCommentRepo, BlogPostRepo blogPostRepo, UserRepo userRepo, ISessionUtil sessionUtil) {
@@ -64,6 +70,36 @@ public class BlogCommentService {
         }
 
         return result;
+    }
+
+    public void createBlogComment(long blogPostId, BlogCommentReqDto request) {
+        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
+        if(loggedUserUsername.isEmpty()) {
+            logger.error("Creating comment failed:\t"+USER_NOT_AUTHORIZED);
+            throw new UnauthorizedException(USER_NOT_AUTHORIZED);
+        }
+
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        if(loggedUser.isEmpty()) {
+            logger.error("Creating comment failed:\t"+USER_BLOCKED_OR_DELETED);
+            throw new NotFoundException(USER_BLOCKED_OR_DELETED);
+        }
+
+        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrue(blogPostId);
+        if(blogPost.isEmpty()) {
+            logger.error("Creating comment failed:\t"+BLOGPOST_NOT_FOUND);
+            throw new NotFoundException(BLOGPOST_NOT_FOUND);
+        }
+
+        if(request.getRating() < 1 || request.getRating() > 5) {
+            logger.error("Creating comment failed:\t"+INVALID_RATING_VALUE);
+            throw new BadRequestException(INVALID_RATING_VALUE);
+        }
+        BlogComment blogComment = mapper.map(request, BlogComment.class);
+        blogComment.setUser(loggedUser.get());
+        blogComment.setBlogPost(blogPost.get());
+        blogCommentRepo.save(blogComment);
+        logger.info("Creating comment success");
     }
 
     public void deleteBlogComment(long blogCommentId) {

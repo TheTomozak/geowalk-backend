@@ -29,14 +29,10 @@ public class BlogCommentController {
         return blogCommentService.getBlogComments(blogId);
     }
 
-    @GetMapping("/byId/{blogCommentId}")
-    public BlogComment getBlogComment(@PathVariable("blogCommentId") long blogCommentId) {
-        return null;
-    }
-
     @PostMapping("/{blogPostId}")
     public void createBlogComment(@PathVariable("blogPostId") long blogPostId, @RequestBody BlogCommentReqDto request) {
-
+        logger.info(String.format("BlogCommentController POST[api/comment/%s] Creating comment related to blogPost with id >>\t%s\t<<", blogPostId, blogPostId));
+        blogCommentService.createBlogComment(blogPostId, request);
     }
 
     @PutMapping("/{blogCommentId}")
