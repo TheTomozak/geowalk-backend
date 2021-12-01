@@ -3,10 +3,14 @@ package com.example.geowalk.services;
 import com.example.geowalk.exceptions.ForbiddenException;
 import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.exceptions.UnauthorizedException;
+import com.example.geowalk.models.dto.responses.BlogCommentResponse;
+import com.example.geowalk.models.dto.responses.UserResDto;
 import com.example.geowalk.models.entities.BlogComment;
+import com.example.geowalk.models.entities.BlogPost;
 import com.example.geowalk.models.entities.User;
 import com.example.geowalk.models.enums.Role;
 import com.example.geowalk.models.repositories.BlogCommentRepo;
+import com.example.geowalk.models.repositories.BlogPostRepo;
 import com.example.geowalk.models.repositories.UserRepo;
 import com.example.geowalk.utils.ISessionUtil;
 import org.modelmapper.ModelMapper;
@@ -15,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +29,7 @@ public class BlogCommentService {
 
     private static final Logger logger = LoggerFactory.getLogger(BlogCommentService.class);
     private final BlogCommentRepo blogCommentRepo;
+    private final BlogPostRepo blogPostRepo;
     private final UserRepo userRepo;
     private ModelMapper mapper;
     private final ISessionUtil sessionUtil;
@@ -30,13 +37,33 @@ public class BlogCommentService {
     private final String USER_NOT_AUTHORIZED = "User is not authenticated";
     private final String USER_BLOCKED_OR_DELETED = "User is deleted/blocked";
     private final String COMMENT_NOT_WRITTEN_BY_THIS_USER = "User cannot delete comment others users";
+    private final String BLOGPOST_NOT_FOUND = "BlogPost with given id not found";
 
     @Autowired
-    public BlogCommentService(BlogCommentRepo blogCommentRepo, UserRepo userRepo, ISessionUtil sessionUtil) {
+    public BlogCommentService(BlogCommentRepo blogCommentRepo, BlogPostRepo blogPostRepo, UserRepo userRepo, ISessionUtil sessionUtil) {
         this.blogCommentRepo = blogCommentRepo;
+        this.blogPostRepo = blogPostRepo;
         this.userRepo = userRepo;
         this.sessionUtil = sessionUtil;
         mapper = new ModelMapper();
+    }
+
+    public List<BlogCommentResponse> getBlogComments(long blogPostId) {
+        Optional<BlogPost> blogPost = blogPostRepo.findById(blogPostId);
+        if(blogPost.isEmpty()) {
+            throw new NotFoundException(BLOGPOST_NOT_FOUND);
+        }
+        List<BlogCommentResponse> result = new ArrayList<>();
+        for (BlogComment blogComment : blogPost.get().getBlogComments()) {
+            if(blogComment.isVisible()) {
+                UserResDto blogCommentUser = mapper.map(blogComment.getUser(), UserResDto.class);
+                BlogCommentResponse blogCommentResponse = mapper.map(blogComment, BlogCommentResponse.class);
+                blogCommentResponse.setUser(blogCommentUser);
+                result.add(blogCommentResponse);
+            }
+        }
+
+        return result;
     }
 
     public void deleteBlogComment(long blogCommentId) {

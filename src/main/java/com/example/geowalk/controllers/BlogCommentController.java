@@ -1,6 +1,7 @@
 package com.example.geowalk.controllers;
 
 import com.example.geowalk.models.dto.requests.BlogCommentReqDto;
+import com.example.geowalk.models.dto.responses.BlogCommentResponse;
 import com.example.geowalk.models.entities.BlogComment;
 import com.example.geowalk.services.BlogCommentService;
 import org.slf4j.Logger;
@@ -23,11 +24,12 @@ public class BlogCommentController {
     }
 
     @GetMapping("/{blogPostId}")
-    public List<BlogComment> getBlogComments(@PathVariable("blogPostId") long blogId) {
-        return null;
+    public List<BlogCommentResponse> getBlogComments(@PathVariable("blogPostId") long blogId) {
+        logger.info(String.format("BlogCommentController GET[api/comment/%s] Getting comments related to blogPost with id >>\t%s\t<<", blogId, blogId));
+        return blogCommentService.getBlogComments(blogId);
     }
 
-    @GetMapping("/{blogCommentId}")
+    @GetMapping("/byId/{blogCommentId}")
     public BlogComment getBlogComment(@PathVariable("blogCommentId") long blogCommentId) {
         return null;
     }
