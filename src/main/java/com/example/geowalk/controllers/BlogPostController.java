@@ -50,8 +50,9 @@ public class BlogPostController {
 
     // TODO: 01.12.2021 Jak to połączyc z sortowaniem jeśli nie ma tej columny a jest to atrybut pochodny.
     @GetMapping("/top-rated")
-    public List<List<BlogPostShortcutResponse>> showBlogPostTopRated(@RequestParam int size){
-        List<List<BlogPostShortcutResponse>> returnList = blogPostService.getTopRatedBlogPost(size);
+    public List<BlogPostShortcutResponse> showBlogPostTopRated(@RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "3") int howManyRecord){
+        List<BlogPostShortcutResponse> returnList = blogPostService.getTopRatedBlogPost(page, howManyRecord);
         logger.info("User has shown top rated blog posts");
         return returnList;
     }
