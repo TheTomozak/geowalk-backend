@@ -1,4 +1,4 @@
-package com.example.geowalk.exceptions.base;
+package com.example.geowalk.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

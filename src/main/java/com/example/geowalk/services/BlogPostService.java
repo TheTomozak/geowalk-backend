@@ -1,11 +1,10 @@
 package com.example.geowalk.services;
 
-import com.example.geowalk.exceptions.base.BadRequestException;
-import com.example.geowalk.exceptions.base.NotFoundException;
+import com.example.geowalk.exceptions.BadRequestException;
+import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.models.dto.ObjectMapperUtils;
 import com.example.geowalk.models.dto.Pagination;
 import com.example.geowalk.models.dto.requests.BlogPostRequest;
-import com.example.geowalk.models.dto.requests.TravelStopRequest;
 import com.example.geowalk.models.dto.responses.BlogPostResponse;
 import com.example.geowalk.models.dto.responses.BlogPostShortcutResponse;
 import com.example.geowalk.models.entities.*;
@@ -15,7 +14,6 @@ import com.example.geowalk.models.repositories.TravelStopRepo;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.transaction.Transactional;
 import java.util.*;

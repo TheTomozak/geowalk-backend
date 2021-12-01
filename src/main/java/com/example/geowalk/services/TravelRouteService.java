@@ -1,6 +1,6 @@
 package com.example.geowalk.services;
 
-import com.example.geowalk.exceptions.base.NotFoundException;
+import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.models.dto.requests.TravelRouteRequest;
 import com.example.geowalk.models.entities.TravelRoute;
 import com.example.geowalk.models.entities.TravelStop;

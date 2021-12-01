@@ -1,15 +1,10 @@
 package com.example.geowalk.models.dto.responses;
 
-import com.example.geowalk.models.entities.BlogPost;
-import com.example.geowalk.models.entities.User;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
 public class BlogCommentResponse {
+
+    private long id;
 
     private String content;
 
@@ -18,6 +13,14 @@ public class BlogCommentResponse {
     private int rating;
 
     private UserResDto user;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getContent() {
         return content;

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
@@ -22,4 +23,5 @@ public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
             "ORDER BY AVG(comment.rating) DESC ) LIMIT :limit OFFSET :offset", nativeQuery = true)
     List<BlogPost> findAllBlogPostOrderByMaxAverageCommentRating(@Param("limit") Long limit, @Param("offset") Long offset);
 
+    Optional<BlogPost> findByIdAndVisibleTrue(long id);
 }

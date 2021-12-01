@@ -1,7 +1,7 @@
 package com.example.geowalk.services;
 
-import com.example.geowalk.exceptions.base.NotAcceptableException;
-import com.example.geowalk.exceptions.base.NotFoundException;
+import com.example.geowalk.exceptions.NotAcceptableException;
+import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.models.dto.requests.UserReqDto;
 import com.example.geowalk.models.entities.User;
 import com.example.geowalk.models.repositories.UserRepo;
