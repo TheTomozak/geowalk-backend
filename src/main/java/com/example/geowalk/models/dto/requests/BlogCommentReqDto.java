@@ -3,7 +3,7 @@ package com.example.geowalk.models.dto.requests;
 public class BlogCommentReqDto {
 
     private String content;
-    private int rating;
+    private Integer rating;
 
     public BlogCommentReqDto() {
     }
@@ -21,11 +21,11 @@ public class BlogCommentReqDto {
         this.content = content;
     }
 
-    public int getRating() {
+    public Integer getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(Integer rating) {
         this.rating = rating;
     }
 }

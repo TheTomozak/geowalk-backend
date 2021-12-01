@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,18 +31,18 @@ import java.util.Optional;
 public class BlogCommentService {
 
     private static final Logger logger = LoggerFactory.getLogger(BlogCommentService.class);
+    private final ModelMapper mapper;
     private final BlogCommentRepo blogCommentRepo;
     private final BlogPostRepo blogPostRepo;
     private final UserRepo userRepo;
-    private ModelMapper mapper;
     private final ISessionUtil sessionUtil;
 
     private final String BLOG_COMMENT_NOT_FOUND = "Blog comment with given id not found";
+    private final String BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER = "User cannot delete comment others users";
+    private final String BLOG_POST_NOT_FOUND = "BlogPost with given id not found";
+    private final String BLOG_POST_INVALID_RATING_VALUE = "Rating value is invalid";
     private final String USER_NOT_AUTHORIZED = "User is not authenticated";
     private final String USER_BLOCKED_OR_DELETED = "User is deleted/blocked";
-    private final String COMMENT_NOT_WRITTEN_BY_THIS_USER = "User cannot delete comment others users";
-    private final String BLOGPOST_NOT_FOUND = "BlogPost with given id not found";
-    private final String INVALID_RATING_VALUE = "Rating value is invalid";
 
     @Autowired
     public BlogCommentService(BlogCommentRepo blogCommentRepo, BlogPostRepo blogPostRepo, UserRepo userRepo, ISessionUtil sessionUtil) {
@@ -57,7 +56,7 @@ public class BlogCommentService {
     public List<BlogCommentResponse> getBlogComments(long blogPostId) {
         Optional<BlogPost> blogPost = blogPostRepo.findById(blogPostId);
         if(blogPost.isEmpty()) {
-            throw new NotFoundException(BLOGPOST_NOT_FOUND);
+            throw new NotFoundException(BLOG_POST_NOT_FOUND);
         }
         List<BlogCommentResponse> result = new ArrayList<>();
         for (BlogComment blogComment : blogPost.get().getBlogComments()) {
@@ -87,13 +86,13 @@ public class BlogCommentService {
 
         Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrue(blogPostId);
         if(blogPost.isEmpty()) {
-            logger.error("Creating comment failed:\t"+BLOGPOST_NOT_FOUND);
-            throw new NotFoundException(BLOGPOST_NOT_FOUND);
+            logger.error("Creating comment failed:\t"+ BLOG_POST_NOT_FOUND);
+            throw new NotFoundException(BLOG_POST_NOT_FOUND);
         }
 
         if(request.getRating() < 1 || request.getRating() > 5) {
-            logger.error("Creating comment failed:\t"+INVALID_RATING_VALUE);
-            throw new BadRequestException(INVALID_RATING_VALUE);
+            logger.error("Creating comment failed:\t"+ BLOG_POST_INVALID_RATING_VALUE);
+            throw new BadRequestException(BLOG_POST_INVALID_RATING_VALUE);
         }
         BlogComment blogComment = mapper.map(request, BlogComment.class);
         blogComment.setUser(loggedUser.get());
@@ -102,28 +101,74 @@ public class BlogCommentService {
         logger.info("Creating comment success");
     }
 
+    public void updateBlogComment(long blogCommentId, BlogCommentReqDto request) {
+        Optional<String> loggedUserUserName = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
+        if(loggedUserUserName.isEmpty()) {
+            logger.error("Updating comment failed:\t"+USER_NOT_AUTHORIZED);
+            throw new UnauthorizedException(USER_NOT_AUTHORIZED);
+        }
+
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUserName.get());
+        if(loggedUser.isEmpty()) {
+            logger.error("Updating comment failed:\t"+USER_BLOCKED_OR_DELETED);
+            throw new NotFoundException(USER_BLOCKED_OR_DELETED);
+        }
+
+        Optional<BlogComment> blogComment = blogCommentRepo.findByIdAndVisibleTrue(blogCommentId);
+        if(blogComment.isEmpty()) {
+            logger.error("Updating comment failed:\t"+BLOG_COMMENT_NOT_FOUND);
+            throw new NotFoundException(BLOG_COMMENT_NOT_FOUND);
+        }
+
+        if(!blogComment.get().getUser().equals(loggedUser)) {
+            if(!(loggedUser.get().getRole().equals(Role.ADMIN) || loggedUser.get().getRole().equals(Role.MODERATOR))) {
+                logger.error("Updating comment failed:\t"+BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER);
+                throw new ForbiddenException(BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER);
+            }
+        }
+
+        if(request.getContent() != null) {
+            if(!request.getContent().isBlank()) {
+                blogComment.get().setContent(request.getContent());
+            }
+        }
+
+        if(request.getRating() != null) {
+            if(request.getRating()<1 || request.getRating()>5) {
+                logger.error("Updating comment failed:\t"+ BLOG_POST_INVALID_RATING_VALUE);
+                throw new BadRequestException(BLOG_POST_INVALID_RATING_VALUE);
+            }
+            blogComment.get().setRating(request.getRating());
+        }
+
+        blogCommentRepo.save(blogComment.get());
+        logger.info("Updating comment success");
+    }
+
     public void deleteBlogComment(long blogCommentId) {
         Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if(loggedUserUsername.isEmpty()) {
-            logger.error("Deleting comment failed:\t"+USER_NOT_AUTHORIZED);
+        if (loggedUserUsername.isEmpty()) {
+            logger.error("Deleting comment failed:\t" + USER_NOT_AUTHORIZED);
             throw new UnauthorizedException(USER_NOT_AUTHORIZED);
         }
 
         Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
-        if(loggedUser.isEmpty()) {
-            logger.error("Deleting comment failed:\t"+USER_BLOCKED_OR_DELETED);
+        if (loggedUser.isEmpty()) {
+            logger.error("Deleting comment failed:\t" + USER_BLOCKED_OR_DELETED);
             throw new NotFoundException(USER_BLOCKED_OR_DELETED);
         }
 
         Optional<BlogComment> blogComment = blogCommentRepo.findById(blogCommentId);
-        if(blogComment.isEmpty()) {
-            logger.error("Deleting comment failed:\t"+BLOG_COMMENT_NOT_FOUND);
+        if (blogComment.isEmpty()) {
+            logger.error("Deleting comment failed:\t" + BLOG_COMMENT_NOT_FOUND);
             throw new NotFoundException(BLOG_COMMENT_NOT_FOUND);
         }
 
-        if(!blogComment.get().getUser().equals(loggedUser.get()) || !loggedUser.get().getRole().equals(Role.ADMIN) || !loggedUser.get().getRole().equals(Role.MODERATOR)) {
-            logger.error("Deleting comment failed:\t"+COMMENT_NOT_WRITTEN_BY_THIS_USER);
-            throw new ForbiddenException(COMMENT_NOT_WRITTEN_BY_THIS_USER);
+        if(!blogComment.get().getUser().equals(loggedUser)) {
+            if(!(loggedUser.get().getRole().equals(Role.ADMIN) || loggedUser.get().getRole().equals(Role.MODERATOR))) {
+                logger.error("Deleting comment failed:\t" + BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER);
+                throw new ForbiddenException(BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER);
+            }
         }
 
         blogComment.get().setVisible(false);

@@ -37,7 +37,8 @@ public class BlogCommentController {
 
     @PutMapping("/{blogCommentId}")
     public void updateBlogComment(@PathVariable("blogCommentId") long blogCommentId, @RequestBody BlogCommentReqDto request) {
-
+        logger.info(String.format("BlogCommentController PUT[api/comment/%s] Updating comment with id >>\t%s\t<<", blogCommentId, blogCommentId));
+        blogCommentService.updateBlogComment(blogCommentId, request);
     }
 
     @DeleteMapping("/{blogCommentId}")
