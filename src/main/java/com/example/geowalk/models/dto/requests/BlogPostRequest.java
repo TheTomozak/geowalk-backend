@@ -1,9 +1,15 @@
 package com.example.geowalk.models.dto.requests;
 
+import com.example.geowalk.models.entities.Tag;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class BlogPostRequest {
+
+    @NotBlank
+    private String title;
 
     @NotBlank
     private String content;
@@ -11,11 +17,28 @@ public class BlogPostRequest {
     @NotNull
     private Long userId;
 
-    private TravelRouteRequest travelRouteRequest;
+    private List<TravelRouteRequest> travelRouteRequestList;
 
-    private TravelStopRequest travelStopRequest;
+    private List<TravelStopRequest> travelStopRequestList;
+
+    private List<String> tagList;
 
 
+    public List<String> getTagList() {
+        return tagList;
+    }
+
+    public void setTagList(List<String> tagList) {
+        this.tagList = tagList;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getContent() {
         return content;
@@ -33,19 +56,19 @@ public class BlogPostRequest {
         this.userId = userId;
     }
 
-    public TravelRouteRequest getTravelRouteRequest() {
-        return travelRouteRequest;
+    public List<TravelRouteRequest> getTravelRouteRequestList() {
+        return travelRouteRequestList;
     }
 
-    public void setTravelRouteRequest(TravelRouteRequest travelRouteRequest) {
-        this.travelRouteRequest = travelRouteRequest;
+    public void setTravelRouteRequestList(List<TravelRouteRequest> travelRouteRequestList) {
+        this.travelRouteRequestList = travelRouteRequestList;
     }
 
-    public TravelStopRequest getTravelStopRequest() {
-        return travelStopRequest;
+    public List<TravelStopRequest> getTravelStopRequestList() {
+        return travelStopRequestList;
     }
 
-    public void setTravelStopRequest(TravelStopRequest travelStopRequest) {
-        this.travelStopRequest = travelStopRequest;
+    public void setTravelStopRequestList(List<TravelStopRequest> travelStopRequestList) {
+        this.travelStopRequestList = travelStopRequestList;
     }
 }

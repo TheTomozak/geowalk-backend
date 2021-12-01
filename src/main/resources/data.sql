@@ -10,29 +10,29 @@ insert into user (first_name, last_name, email, password, role, visible) values
     ('Paulina', 'Pawłowicz', 'paulina@gmail.com', 'password', 'USER', true),        --7
     ('Mateusz', 'Ustew', 'mateusz@gmail.com', 'password', 'USER', true);            --8
 
-insert into travel_stop (name, latitude, longitude, visible) values
-    ('PJATK', '52.223941713710204', '20.99456713842226', true),                                      --1
-    ('Galeria mokotów', '52.17986650656597', '21.004595882599652', true),                            --2
-    ('Stacja Grawitacja', '52.21286546599547', '20.96246636355756', true),                           --3
+insert into travel_stop (name, latitude, longitude, visible, country, city, street) values
+    ('PJATK', '52.223941713710204', '20.99456713842226', true, 'Poland', 'Warszawa', 'Koszykowa 86'),                                                   --1
+    ('Galeria mokotów', '52.17986650656597', '21.004595882599652', true, 'Poland', 'Warszawa', 'Wołoska 12'),                                           --2
+    ('Stacja Grawitacja', '52.21286546599547', '20.96246636355756', true, 'Poland', 'Warszawa', 'Aleja Bohaterów Września 12'),                         --3
 
-    ('Muzeum Pałacu Króla Jana III w Wilanowie', '52.165338097257546', '21.09058362913881', true),   --4
+    ('Muzeum Pałacu Króla Jana III w Wilanowie', '52.165338097257546', '21.09058362913881', true, 'Polska', 'Warszawa', 'Stanisława Kostki Potockiego 10/16'),   --4
 
-    ('Bazylika Swietego Piotra', '41.90228751188043', '12.454159580944626', true),      --5
-    ('Porta Pertusa', '41.901329277006845', '12.447389663927183', true),                --6
-    ('Muzea Watykańskie', '41.906388500092824', '12.453673798804596', true),            --7
-    ('Fontana di Porta Cavalleggeri', '41.9006810155548', '12.4561728483282', true),    --8
+    ('Bazylika Świętego Piotra', '41.90228751188043', '12.454159580944626', true, 'Vatican', 'Roma', 'Forum Sancti Petri'),      --5
+    ('Porta Pertusa', '41.901329277006845', '12.447389663927183', true, 'Vatican', 'Roma', 'Forum Sancti Petri'),                --6
+    ('Muzea Watykańskie', '41.906388500092824', '12.453673798804596', true, 'Vatican', 'Roma', 'Viale Vaticano'),            --7
+    ('Fontana di Porta Cavalleggeri', '41.9006810155548', '12.4561728483282', true, 'Vatican', 'Roma', 'Forum Sancti Petri'),    --8
 
-    ('Meczet Ahmada Ibn Tuluna', '30.0307473551421', '31.25591957837077', true),        --9
-    ('Uniwersytet Kairski', '30.028454548217717', '31.20874850766373', true),           --10
-    ('Desert Egypt Safari', '29.982731287249205', '31.163992204860232', true),          --11
+    ('Meczet Ahmada Ibn Tuluna', '30.0307473551421', '31.25591957837077', true, 'Egypt', 'Egypt-city', 'Egypt-street'),        --9
+    ('Uniwersytet Kairski', '30.028454548217717', '31.20874850766373', true, 'Egypt', 'Egypt-city', 'Egypt-street 1'),           --10
+    ('Desert Egypt Safari', '29.982731287249205', '31.163992204860232', true, 'Egypt', 'Egypt-city', 'Egypt-street 2'),          --11
 
-    ('Los Angeles County Museum of Art', '34.06000332007767', '-118.36138812929498', true), --12
-    ('Walt Disney Concert Hall', '34.05289236567532', '-118.24912159231603', true),         --13
-    ('Rose Bowl', '34.16602787734609', '-118.1553944820622', true),                         --14
-    ('Los Angeles Valley College', '34.169720706444274', '-118.41528980288447', true),      --15
-    ('The Getty', '34.07592969428845', '-118.47434131474418', true),                        --16
+    ('Los Angeles County Museum of Art', '34.06487300861231', '-118.3567135201173', true, 'USA', 'USA-City', 'USA-Street'), --12
+    ('Walt Disney Concert Hall', '34.05289236567532', '-118.24912159231603', true, 'USA', 'USA-City 1', 'USA-Street'),         --13
+    ('Rose Bowl', '34.16602787734609', '-118.1553944820622', true, 'USA', 'USA-City 2', 'USA-Street'),                         --14
+    ('Los Angeles Valley College', '34.169720706444274', '-118.41528980288447', true, 'USA', 'USA-City 3', 'USA-Street'),      --15
+    ('The Getty', '34.07592969428845', '-118.47434131474418', true, 'USA', 'USA-City 4', 'USA-Street'),                        --16
 
-    ('Cowboys Casino', '51.0438273528732', '-114.04098858356981', true);                    --17
+    ('Cowboys Casino', '51.0438273528732', '-114.04098858356981', true, 'USA', 'USA-City 4', 'USA-Street');                    --17
 
 insert into travel_route (name, difficulty, description, visible) values
     ('Wycieczka po Warszawie', 'MEDIUM', 'Trasa dla osób odwiedzających Warszawe', true),   --1
@@ -40,13 +40,13 @@ insert into travel_route (name, difficulty, description, visible) values
     ('Egipt', 'EASY', 'Latwa trasa po Egipcie, autokarem', true),                           --3
     ('Amerykanski Sen', 'HARD', 'Zwiedzanie LA w USA!', true);                              --4
 
-insert into blog_post (content, creation_date_time, last_edit_date_time, user_id, visible) values
-    ('Przechadzka po Warszawie. Nauka-zakupy-spacer', '2021-08-09', null, 4, true),                                 --1
-    ('Ciekawa i historyczna wycieczka po Zamku.', '2021-08-15', null, 3, true),                                     --2
-    ('Dzisiaj byłem w Watykanie. Swietne miejsce, daje dużo do myślenia!', '2021-07-15', null, 1, true),            --3
-    ('Niesamowicie bylo zwiedzic chociaz troche Egipt. Wycieczka Quadami mega.', '2021-07-01', null, 2, true),      --4
-    ('Bardzo Amerykanskie i bardzo ciekawe przystanki. Zachecam do czytania dalej.', '2021-06-09', null, 3, true),  --5
-    ('Kasyno w kozackim stylu.', '2021-08-10', null, 4, true);                                                      --6
+insert into blog_post (title, content, creation_date_time, last_edit_date_time, user_id, visible, number_of_visits) values
+    ('Amerykańskia Warszawa','Przechadzka po Warszawie. Nauka-zakupy-spacer', '2021-08-09', null, 4, true, 1),                                 --1
+    ('Tytuł','Ciekawa i historyczna wycieczka po Zamku.', '2021-08-15', null, 3, true,2),                                     --2
+    ('Tytułowy','Dzisiaj byłem w Watykanie. Swietne miejsce, daje dużo do myślenia!', '2021-07-15', null, 1, true,3),            --3
+    ('MEGA Tytuł','Niesamowicie bylo zwiedzic chociaz troche Egipt. Wycieczka Quadami mega.', '2021-07-01', null, 2, true,2),      --4
+    ('Ameryka','Bardzo Amerykanskie i bardzo ciekawe przystanki. Zachecam do czytania dalej.', '2021-06-09', null, 3, true,66),  --5
+    ('Warszawa ale jednak nie','Kasyno w kozackim stylu.', '2021-08-10', null, 4, true, 7);                                                      --6
 
 insert into blog_comment(content, creation_date_time, rating, user_id, visible, blog_post_id) values
     ('Ciekawa trasa!','2021-09-15', 4, 1, true, 1),                        --1

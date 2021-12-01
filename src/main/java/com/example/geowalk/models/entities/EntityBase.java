@@ -13,6 +13,9 @@ public abstract class EntityBase {
     @Column(nullable = false)
     private boolean visible = true;
 
+    public EntityBase() {
+    }
+
     public Long getId() {
         return id;
     }
