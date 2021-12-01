@@ -1,7 +1,7 @@
 package com.example.geowalk.services;
 
-import com.example.geowalk.exceptions.base.BadRequestException;
-import com.example.geowalk.exceptions.base.NotFoundException;
+import com.example.geowalk.exceptions.BadRequestException;
+import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.models.dto.requests.TravelStopRequest;
 import com.example.geowalk.models.entities.TravelStop;
 import com.example.geowalk.models.repositories.TravelStopRepo;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Transactional
