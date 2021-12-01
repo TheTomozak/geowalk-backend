@@ -13,6 +13,10 @@ import java.util.List;
 
 public class BlogPostResponse {
 
+    private Long id;
+
+    private String title;
+
     private String content;
 
     private LocalDateTime creationDateTime;
@@ -24,12 +28,32 @@ public class BlogPostResponse {
     private List<BlogCommentResponse> blogComments;
 
     private List<TravelStopResponse> travelStops;
-//
+
     private List<TravelRouteResponse> travelRoutes;
+
+    private Long numberOfVisits;
+
+    private Double rateAverage;
 
 //    private List<Image> images;
 //    private List<Tag> tags;
 
+
+    public Double getRateAverage() {
+        return rateAverage;
+    }
+
+    public void setRateAverage(Double rateAverage) {
+        this.rateAverage = rateAverage;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getContent() {
         return content;
@@ -85,5 +109,21 @@ public class BlogPostResponse {
 
     public void setTravelRoutes(List<TravelRouteResponse> travelRoutes) {
         this.travelRoutes = travelRoutes;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getNumberOfVisits() {
+        return numberOfVisits;
+    }
+
+    public void setNumberOfVisits(Long numberOfVisits) {
+        this.numberOfVisits = numberOfVisits;
     }
 }

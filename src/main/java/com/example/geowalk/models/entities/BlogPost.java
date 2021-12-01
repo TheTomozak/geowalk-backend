@@ -13,6 +13,9 @@ public class BlogPost extends EntityBase {
     private String content;
 
     @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
     private LocalDateTime creationDateTime = LocalDateTime.now();
 
     @Column(nullable = true)
@@ -46,11 +49,16 @@ public class BlogPost extends EntityBase {
             inverseJoinColumns = {@JoinColumn(name = "tag_id")})
     private List<Tag> tags = new ArrayList<>();
 
-    public BlogPost() {
+    private Long numberOfVisits;
+
+    public BlogPost(String content, String title) {
+        this.content = content;
+        this.title = title;
+        numberOfVisits = 0L;
     }
 
-    public BlogPost(String content) {
-        this.content = content;
+    public BlogPost() {
+        super();
     }
 
     public String getContent() {
@@ -123,6 +131,22 @@ public class BlogPost extends EntityBase {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public Long getNumberOfVisits() {
+        return numberOfVisits;
+    }
+
+    public void setNumberOfVisits(Long numberOfVisits) {
+        this.numberOfVisits = numberOfVisits;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Double rateAverage(){

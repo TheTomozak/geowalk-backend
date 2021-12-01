@@ -45,10 +45,9 @@ public class TravelRouteService {
             travelRouteRequest.getDescription()
         );
 
-        List<TravelStop> travelStopList = new ArrayList<>();
-        travelRouteRequest.getTravelStopList().forEach(e -> travelStopList.add(travelStopService.createTravelStop(e)));
-        travelStopRepository.saveAll(travelStopList);
-
+        List<TravelStop> travelStopList = new ArrayList<>(travelStopService.getOrCreateTravelStopsByLocation(
+                new ArrayList<>(travelRouteRequest.getTravelStopList()))
+        );
         travelRoute.setTravelStops(travelStopList);
         return travelRoute;
     }
