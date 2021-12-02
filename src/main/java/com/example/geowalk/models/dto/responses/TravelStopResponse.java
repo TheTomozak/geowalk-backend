@@ -10,11 +10,11 @@ public class TravelStopResponse {
 
     private double longitude;
 
-    private String Country;
+    private String country;
 
-    private String City;
+    private String city;
 
-    private String Street;
+    private String street;
 
     public String getName() {
         return name;
@@ -41,26 +41,26 @@ public class TravelStopResponse {
     }
 
     public String getCountry() {
-        return Country;
+        return country;
     }
 
     public void setCountry(String country) {
-        Country = country;
+        country = country;
     }
 
     public String getCity() {
-        return City;
+        return city;
     }
 
     public void setCity(String city) {
-        City = city;
+        city = city;
     }
 
     public String getStreet() {
-        return Street;
+        return street;
     }
 
     public void setStreet(String street) {
-        Street = street;
+        street = street;
     }
 }

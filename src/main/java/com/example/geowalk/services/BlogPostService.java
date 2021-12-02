@@ -3,7 +3,6 @@ package com.example.geowalk.services;
 import com.example.geowalk.exceptions.BadRequestException;
 import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.models.dto.ObjectMapperUtils;
-import com.example.geowalk.models.dto.Pagination;
 import com.example.geowalk.models.dto.requests.BlogPostRequest;
 import com.example.geowalk.models.dto.responses.BlogPostResponse;
 import com.example.geowalk.models.dto.responses.BlogPostShortcutResponse;
@@ -12,11 +11,19 @@ import com.example.geowalk.models.repositories.BlogPostRepo;
 import com.example.geowalk.models.repositories.TravelRouteRepo;
 import com.example.geowalk.models.repositories.TravelStopRepo;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -33,6 +40,12 @@ public class BlogPostService {
     private final TagService tagService;
 
     private ModelMapper mapper = new ModelMapper();
+    private static final Logger logger = LoggerFactory.getLogger(BlogPostService.class);
+
+    private final String LOGGER_GET_BLOGPOST_FAILED = "Getting BlogPost failed:\t";
+    private final String LOGGER_CREATE_BLOGPOST_FAILED = "Creating BlogPost failed:\t";
+    private final String LOGGER_UPDATE_BLOGPOST_FAILED = "Updating BlogPost failed:\t";
+    private final String LOGGER_DELETE_BLOGPOST_FAILED = "Deleting BlogPost failed:\t";
 
     private final String NOT_FOUND_BLOG_POST = "Blog post with given id not found";
     private final String BAD_REQUEST_BLOG_POST = "Blog post request has bad body";
@@ -60,6 +73,7 @@ public class BlogPostService {
         blogPost.setUser(user);
 
         if (toCreate.getTravelRouteRequestList() != null && toCreate.getTravelStopRequestList() != null) {
+            logger.warn(LOGGER_GET_BLOGPOST_FAILED + BAD_REQUEST_BLOG_POST);
             throw new BadRequestException(BAD_REQUEST_BLOG_POST);
         }
 
@@ -68,6 +82,7 @@ public class BlogPostService {
             List<TravelRoute> travelRouteList = new ArrayList<>();
             toCreate.getTravelRouteRequestList().forEach(e -> {
                 if (e.getTravelStopList().size() < 2) {
+                    logger.warn(LOGGER_GET_BLOGPOST_FAILED + BAD_REQUEST_BLOG_POST);
                     throw new BadRequestException(BAD_REQUEST_BLOG_POST);
                 }
                 travelRouteList.add(travelRouteService.createTravelRoute(e));
@@ -183,16 +198,19 @@ public class BlogPostService {
     }
 
     private BlogPostResponse map(BlogPost blogPost) {
-        return mapper.map(blogPost, BlogPostResponse.class);
+
+        BlogPostResponse bpR = mapper.map(blogPost, BlogPostResponse.class);
+        bpR.setRateAverage(blogPost.rateAverage());
+        return bpR;
     }
 
-    public BlogPost findBlogPostById(Long blogPostId) {
+    public BlogPost findBlogPostById(Long blogPostId, String loggerMsg) {
         return blogPostRepository.findById(blogPostId)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_BLOG_POST));
+                .orElseThrow(() -> throwExcWithLogger(loggerMsg));
     }
 
     public BlogPostResponse getBlogPostById(Long blogPostId) {
-        BlogPost bP = findBlogPostById(blogPostId);
+        BlogPost bP = findBlogPostById(blogPostId, LOGGER_GET_BLOGPOST_FAILED);
         bP.setNumberOfVisits(bP.getNumberOfVisits() + 1);
         return map(bP);
     }
@@ -206,5 +224,8 @@ public class BlogPostService {
         return ObjectMapperUtils.mapAll(blogPostList, BlogPostResponse.class);
     }
 
-
+    private NotFoundException throwExcWithLogger(String loggerMsg){
+        logger.warn(loggerMsg+NOT_FOUND_BLOG_POST);
+        return new NotFoundException(NOT_FOUND_BLOG_POST);
+    }
 }
