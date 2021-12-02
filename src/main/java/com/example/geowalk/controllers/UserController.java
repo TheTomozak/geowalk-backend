@@ -4,6 +4,7 @@ import com.example.geowalk.models.dto.ObjectMapperUtils;
 import com.example.geowalk.models.dto.requests.UserReqDto;
 import com.example.geowalk.models.dto.responses.UserDetailsResDto;
 import com.example.geowalk.models.dto.responses.UserResDto;
+import com.example.geowalk.models.entities.User;
 import com.example.geowalk.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -30,19 +31,25 @@ public class UserController {
     @GetMapping
     public List<UserResDto> getUsers() {
         logger.info("UserController GET[api/users] Getting all users");
-        return ObjectMapperUtils.mapAll(userService.getUsers(), UserResDto.class);
+        List<User> users = userService.getUsers();
+        logger.info("Getting users success");
+        return ObjectMapperUtils.mapAll(users, UserResDto.class);
     }
 
     @GetMapping("/{userId}")
     public UserDetailsResDto getUser(@PathVariable("userId") long userId) {
         logger.info(String.format("UserController GET[api/users/%s] Getting user with id >>\t%s\t<<", userId, userId));
-        return ObjectMapperUtils.map(userService.getUser(userId), UserDetailsResDto.class);
+        User user = userService.getUser(userId);
+        logger.info("Getting user success");
+        return ObjectMapperUtils.map(user, UserDetailsResDto.class);
     }
 
     @GetMapping("byEmail/{email}")
     public UserDetailsResDto getUser(@PathVariable("email") String email) {
         logger.info(String.format("UserController GET[api/users/%s] Getting user with email >>\t%s\t<<", email, email));
-        return mapper.map(userService.getUser(email), UserDetailsResDto.class);
+        User user = userService.getUser(email);
+        logger.info("Getting user success");
+        return mapper.map(user, UserDetailsResDto.class);
     }
 
     @PostMapping
