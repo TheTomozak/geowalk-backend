@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
 
-    List<BlogPost> findAllByTitleContainingIgnoreCase(String title);
+    Page<BlogPost> findAllByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     @Query(value = "Select * from BLOG_POST where ID IN (SELECT post.id FROM BLOG_POST post " +
             "LEFT JOIN BLOG_COMMENT comment ON post.ID = comment.BLOG_POST_ID " +

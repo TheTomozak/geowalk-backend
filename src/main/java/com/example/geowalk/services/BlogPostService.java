@@ -143,16 +143,13 @@ public class BlogPostService {
     }
 
     // TODO: 01.12.2021 Nie dziala stronnicowanie
-    public Page<BlogPostResponse> getAllBlogPostByTitle(int offset, int pageSize, String title) {
-        List<BlogPost> blogPostList = new ArrayList<>(new HashSet<>(blogPostRepository.findAllByTitleContainingIgnoreCase(title)));
-        return new PageImpl<BlogPost>(blogPostList, PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.DESC, "numberOfVisits")), blogPostList.size())
-                .map(new Function<BlogPost, BlogPostResponse>() {
-                    @Override
-                    public BlogPostResponse apply(BlogPost blogPost) {
-                        BlogPostResponse bpSR = mapper.map(blogPost, BlogPostResponse.class);
-                        bpSR.setRateAverage(blogPost.rateAverage());
-                        return bpSR;
-                    }
+    public Page<BlogPostResponse> getAllBlogPostByTitle(int page, int howManyRecord, String title) {
+        Page<BlogPost> blogPostList = blogPostRepository.findAllByTitleContainingIgnoreCase(title, PageRequest.of(page, howManyRecord));
+        return blogPostList
+                .map(blogPost -> {
+                    BlogPostResponse bpSR = mapper.map(blogPost, BlogPostResponse.class);
+                    bpSR.setRateAverage(blogPost.rateAverage());
+                    return bpSR;
                 });
     }
 

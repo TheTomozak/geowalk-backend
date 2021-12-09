@@ -7,7 +7,6 @@ import com.example.geowalk.services.BlogPostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -76,8 +75,8 @@ public class BlogPostController {
     }
 
     @GetMapping("/title")
-    public Page<BlogPostResponse> showAllBlogPostsByTitle(@RequestParam int offset, @RequestParam int pageSize, @RequestParam String title){
-        return blogPostService.getAllBlogPostByTitle(offset, pageSize, title);
+    public Page<BlogPostResponse> showAllBlogPostsByTitle(@RequestParam (defaultValue = "0") int page, @RequestParam (defaultValue = "3") int howManyRecord, @RequestParam String title){
+        return blogPostService.getAllBlogPostByTitle(page, howManyRecord, title);
     }
 
     @GetMapping("/tags")
