@@ -5,6 +5,8 @@ import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.models.dto.requests.TravelStopRequest;
 import com.example.geowalk.models.entities.TravelStop;
 import com.example.geowalk.models.repositories.TravelStopRepo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
