@@ -20,10 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -78,7 +75,6 @@ public class BlogPostService {
         }
 
         if (toCreate.getTravelRouteRequestList() != null) {
-            // TODO: 05.12.2021 TravelRoute nie sprawdzam bo jak ktos moze tworzyc sobie go z innya nazwa albo innyą trudnościa.
             List<TravelRoute> travelRouteList = new ArrayList<>();
             toCreate.getTravelRouteRequestList().forEach(e -> {
                 if (e.getTravelStopList().size() < 2) {
@@ -117,68 +113,75 @@ public class BlogPostService {
     }
 
 
-    public Set<BlogPostResponse> getBlogPostsAboutTravelStopByName(String country, String city, String street) {
+    public Page<BlogPostShortcutResponse> getBlogPostsAboutTravelStopByName(String country, String city, String street, int page, int howManyRecord) {
 
 
         List<TravelStop> travelStop = travelStopService.getAllTravelStopByLocation(country, city, street);
-        List<BlogPost> blogPostList = new ArrayList<>();
 
+        List<BlogPost> listBlogPost = new ArrayList<>();
         travelStop.forEach(e -> {
-            blogPostList.addAll(e.getBlogPosts());
+            listBlogPost.addAll(e.getBlogPosts());
         });
 
-        return new HashSet<>(ObjectMapperUtils.mapAll(new HashSet<>(blogPostList), BlogPostResponse.class));
+        return returnMappedPageBlogPostShortcutResponse(listBlogPost, page, howManyRecord);
     }
 
-    public Set<BlogPostResponse> getAllBlogPostAboutTravelRouteByTravelStopLocationName(String country, String city, String street) {
+    public Page<BlogPostShortcutResponse> getAllBlogPostAboutTravelRouteByTravelStopLocationName(String country, String city, String street, int page, int howManyRecord) {
 
         List<TravelStop> travelStop = travelStopService.getAllTravelStopByLocation(country, city, street);
-        List<BlogPost> blogPostList = new ArrayList<>();
 
+        List<BlogPost> listBlogPost = new ArrayList<>();
         travelStop.forEach(e -> {
-            e.getTravelRoutes().forEach(el -> blogPostList.addAll(el.getBlogPosts()));
+            e.getTravelRoutes().forEach(el -> listBlogPost.addAll(el.getBlogPosts()));
         });
 
-        return new HashSet<>(ObjectMapperUtils.mapAll(new HashSet<>(blogPostList), BlogPostResponse.class));
+        return returnMappedPageBlogPostShortcutResponse(listBlogPost, page, howManyRecord);
     }
 
-    // TODO: 01.12.2021 Nie dziala stronnicowanie
-    public Page<BlogPostResponse> getAllBlogPostByTitle(int page, int howManyRecord, String title) {
-        Page<BlogPost> blogPostList = blogPostRepository.findAllByTitleContainingIgnoreCase(title, PageRequest.of(page, howManyRecord));
-        return blogPostList
-                .map(blogPost -> {
-                    BlogPostResponse bpSR = mapper.map(blogPost, BlogPostResponse.class);
-                    bpSR.setRateAverage(blogPost.rateAverage());
-                    return bpSR;
-                });
-    }
+    public Page<BlogPostShortcutResponse> getAllBlogPostByTitleAndTags(int page, int howManyRecord, List<String> tagListParam, String titleParam) {
 
-    public Set<BlogPostResponse> getAllBlogPostByTag(List<String> tags) {
+        if (titleParam != null && tagListParam != null) {
+            List<Tag> tagList = new ArrayList<>();
+            tagListParam.forEach(e -> {
+                Tag tag = tagService.findTagByName(e);
+                if (tag != null)
+                    tagList.add(tag);
+            });
+            List<BlogPost> blogPostList = findAllBlogPost().stream()
+                    .filter(e -> e.getTitle().toLowerCase().contains(titleParam.toLowerCase()))
+                    .filter(e -> e.getTags().containsAll(tagList))
+                    .collect(Collectors.toList());
+            return returnMappedPageBlogPostShortcutResponse(blogPostList, page, howManyRecord);
 
-        List<Tag> tagList = new ArrayList<>();
-        tags.forEach(e -> {
-            Tag tag = tagService.findTagByName(e);
-            if (tag != null)
-                tagList.add(tag);
-        });
+        } else if (tagListParam != null) {
+            List<Tag> tagList = new ArrayList<>();
+            tagListParam.forEach(e -> {
+                Tag tag = tagService.findTagByName(e);
+                if (tag != null)
+                    tagList.add(tag);
+            });
+            List<BlogPost> blogPostList = findAllBlogPost().stream()
+                    .filter(e -> e.getTags().containsAll(tagList))
+                    .collect(Collectors.toList());
+            return returnMappedPageBlogPostShortcutResponse(blogPostList, page, howManyRecord);
 
-        List<BlogPost> blogPostList = findAllBlogPost().stream()
-                .filter(e -> e.getTags().containsAll(tagList))
-                .collect(Collectors.toList());
-        return new HashSet<>(ObjectMapperUtils.mapAll(new HashSet<>(blogPostList), BlogPostResponse.class));
-    }
-
-
-    public List<BlogPostShortcutResponse> getTopRatedBlogPost(long page, long howManyRecord) {
-
-        if (howManyRecord < 0) {
-            howManyRecord = 0;
+        } else if (titleParam != null) {
+            Page<BlogPostShortcutResponse> blogPostList = blogPostRepository.findAllByTitleContainingIgnoreCase(titleParam, PageRequest.of(page, howManyRecord))
+                    .map(new Function<BlogPost, BlogPostShortcutResponse>() {
+                        @Override
+                        public BlogPostShortcutResponse apply(BlogPost blogPost) {
+                            BlogPostShortcutResponse bpSR = mapper.map(blogPost, BlogPostShortcutResponse.class);
+                            bpSR.setRateAverage(blogPost.rateAverage());
+                            return bpSR;
+                        }
+                    });
         }
+        return new PageImpl<BlogPostShortcutResponse>(Collections.emptyList(), PageRequest.of(page, howManyRecord), 0);
+    }
 
-        List<BlogPost> returnPageList = blogPostRepository.
-                findAllBlogPostOrderByMaxAverageCommentRating(howManyRecord, (howManyRecord * page));
-
-        return ObjectMapperUtils.mapAll(returnPageList, BlogPostShortcutResponse.class);
+    public Page<BlogPostShortcutResponse> getTopRatedBlogPost(int page, int howManyRecord) {
+        List<BlogPost> listBP = findAllBlogPost().stream().sorted(Comparator.comparingDouble(BlogPost::rateAverage).reversed()).collect(Collectors.toList());
+        return returnMappedPageBlogPostShortcutResponse(listBP, page, howManyRecord);
     }
 
     public Page<BlogPostShortcutResponse> getBlogPostByPageAndSort(int offset, int pageSize, String column) {
@@ -212,7 +215,6 @@ public class BlogPostService {
         return map(bP);
     }
 
-
     public List<BlogPost> findAllBlogPost() {
         return blogPostRepository.findAll();
     }
@@ -221,8 +223,41 @@ public class BlogPostService {
         return ObjectMapperUtils.mapAll(blogPostList, BlogPostResponse.class);
     }
 
-    private NotFoundException throwExcWithLogger(String loggerMsg){
-        logger.warn(loggerMsg+NOT_FOUND_BLOG_POST);
+    private NotFoundException throwExcWithLogger(String loggerMsg) {
+        logger.warn(loggerMsg + NOT_FOUND_BLOG_POST);
         return new NotFoundException(NOT_FOUND_BLOG_POST);
+    }
+
+    private Page<BlogPostShortcutResponse> returnMappedPageBlogPostShortcutResponse(List<BlogPost> listBlogPost, int page, int howManyRecord) {
+        var distinctListBlogPost = new ArrayList<>(new HashSet<>(listBlogPost));
+
+        if (page < 0) {
+            page = 0;
+        }
+        if (howManyRecord < 0) {
+            howManyRecord = 0;
+        }
+
+        int fromIndex = page * howManyRecord + page;
+        int toIndex;
+
+        Page<BlogPost> blogPostList;
+        try {
+            toIndex = Math.min(fromIndex + howManyRecord, distinctListBlogPost.size() - 1);
+            blogPostList = new PageImpl<BlogPost>(distinctListBlogPost.subList(fromIndex, toIndex), PageRequest.of(page, howManyRecord), distinctListBlogPost.size());
+        } catch (IllegalArgumentException e) {
+            toIndex = Math.min(5, distinctListBlogPost.size());
+            blogPostList = new PageImpl<BlogPost>(distinctListBlogPost.subList(0, toIndex), PageRequest.of(0, 5), distinctListBlogPost.size());
+        }
+
+
+        return blogPostList.map(new Function<BlogPost, BlogPostShortcutResponse>() {
+            @Override
+            public BlogPostShortcutResponse apply(BlogPost blogPost) {
+                BlogPostShortcutResponse bpSR = mapper.map(blogPost, BlogPostShortcutResponse.class);
+                bpSR.setRateAverage(blogPost.rateAverage());
+                return bpSR;
+            }
+        });
     }
 }

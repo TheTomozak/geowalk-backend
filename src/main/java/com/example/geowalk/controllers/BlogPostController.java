@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("api/blog")
@@ -25,7 +24,7 @@ public class BlogPostController {
     }
 
     @PostMapping("/post")
-    public void createBlogPost(@RequestBody BlogPostRequest toCreate){
+    public void createBlogPost(@RequestBody BlogPostRequest toCreate) {
         blogPostService.createBlogPost(toCreate);
         logger.info("User has created blog post");
     }
@@ -41,46 +40,49 @@ public class BlogPostController {
     }
 
     @GetMapping("")
-    public Page<BlogPostShortcutResponse> getBlogPostByPageAndSort(@RequestParam int offset, @RequestParam int pageSize, @RequestParam String column){
-        Page<BlogPostShortcutResponse> returnList = blogPostService.getBlogPostByPageAndSort(offset, pageSize, column);
-        logger.info("User has shown blog posts sorted by column: "+column);
+    public Page<BlogPostShortcutResponse> getBlogPostByPageAndSort(@RequestParam int page, @RequestParam int howManyRecord, @RequestParam String column) {
+        Page<BlogPostShortcutResponse> returnList = blogPostService.getBlogPostByPageAndSort(page, howManyRecord, column);
+        logger.info("User has shown blog posts sorted by column: " + column);
         return returnList;
     }
 
-    // TODO: 01.12.2021 Jak to połączyc z sortowaniem jeśli nie ma tej columny a jest to atrybut pochodny.
     @GetMapping("/top-rated")
-    public List<BlogPostShortcutResponse> showBlogPostTopRated(@RequestParam(defaultValue = "0") int page,
-                                                               @RequestParam(defaultValue = "3") int howManyRecord){
-        List<BlogPostShortcutResponse> returnList = blogPostService.getTopRatedBlogPost(page, howManyRecord);
+    public Page<BlogPostShortcutResponse> showBlogPostTopRated(@RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "3") int howManyRecord) {
+        Page<BlogPostShortcutResponse> returnList = blogPostService.getTopRatedBlogPost(page, howManyRecord);
         logger.info("User has shown top rated blog posts");
         return returnList;
     }
 
     @GetMapping("/travel-stops")
-    public Set<BlogPostResponse> showBlogPostsAboutTravelStop(@RequestParam String country,
-                                                              @RequestParam(required = false) String city,
-                                                              @RequestParam(required = false) String street) {
-        Set<BlogPostResponse> returnList = blogPostService.getBlogPostsAboutTravelStopByName(country, city, street);
+    public Page<BlogPostShortcutResponse> showBlogPostsAboutTravelStop(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int howManyRecord,
+                                                                       @RequestParam String country,
+                                                                       @RequestParam(required = false) String city,
+                                                                       @RequestParam(required = false) String street) {
+        Page<BlogPostShortcutResponse> returnList = blogPostService.getBlogPostsAboutTravelStopByName(country, city, street, page, howManyRecord);
         logger.info("User has shown blog posts about travelStop");
         return returnList;
     }
 
     @GetMapping("/travel-routes")
-    public Set<BlogPostResponse> showAllBlogPostsAboutTravelRouteByTravelStop(@RequestParam String country,
-                                                                              @RequestParam(required = false) String city,
-                                                                              @RequestParam(required = false) String street) {
-        Set<BlogPostResponse> returnList = blogPostService.getAllBlogPostAboutTravelRouteByTravelStopLocationName(country, city, street);
+    public Page<BlogPostShortcutResponse> showAllBlogPostsAboutTravelRouteByTravelStop(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int howManyRecord,
+                                                                                       @RequestParam String country,
+                                                                                       @RequestParam(required = false) String city,
+                                                                                       @RequestParam(required = false) String street) {
+        Page<BlogPostShortcutResponse> returnList = blogPostService.getAllBlogPostAboutTravelRouteByTravelStopLocationName(country, city, street, page, howManyRecord);
         logger.info("User has shown blog posts about travelRoute with travelStop");
         return returnList;
     }
 
-    @GetMapping("/title")
-    public Page<BlogPostResponse> showAllBlogPostsByTitle(@RequestParam (defaultValue = "0") int page, @RequestParam (defaultValue = "3") int howManyRecord, @RequestParam String title){
-        return blogPostService.getAllBlogPostByTitle(page, howManyRecord, title);
+
+
+
+
+    @GetMapping("/titleAndTag")
+    public Page<BlogPostShortcutResponse> showAllBlogPostsByTitle(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "3") int howManyRecord,
+                                                                  @RequestParam(required = false) List<String> listTags, @RequestParam(required = false) String title) {
+        return blogPostService.getAllBlogPostByTitleAndTags(page, howManyRecord, listTags, title);
     }
 
-    @GetMapping("/tags")
-    public Set<BlogPostResponse> showAllBlogPostsByTags(@RequestParam List<String> tags){
-        return blogPostService.getAllBlogPostByTag(tags);
-    }
+
 }

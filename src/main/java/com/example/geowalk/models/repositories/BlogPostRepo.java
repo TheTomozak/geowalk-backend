@@ -1,6 +1,7 @@
 package com.example.geowalk.models.repositories;
 
 import com.example.geowalk.models.entities.BlogPost;
+import com.example.geowalk.models.entities.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,11 +18,13 @@ public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
 
     Page<BlogPost> findAllByTitleContainingIgnoreCase(String title, Pageable pageable);
 
-    @Query(value = "Select * from BLOG_POST where ID IN (SELECT post.id FROM BLOG_POST post " +
-            "LEFT JOIN BLOG_COMMENT comment ON post.ID = comment.BLOG_POST_ID " +
-            "GROUP BY post.id " +
-            "ORDER BY AVG(comment.rating) DESC ) LIMIT :limit OFFSET :offset", nativeQuery = true)
-    List<BlogPost> findAllBlogPostOrderByMaxAverageCommentRating(@Param("limit") Long limit, @Param("offset") Long offset);
+//    @Query(value = "Select * from BLOG_POST where ID IN (SELECT post.id FROM BLOG_POST post " +
+//            "LEFT JOIN BLOG_COMMENT comment ON post.ID = comment.BLOG_POST_ID " +
+//            "GROUP BY post.id " +
+//            "ORDER BY AVG(comment.rating) DESC ) LIMIT :limit OFFSET :offset", nativeQuery = true)
+//    List<BlogPost> findAllBlogPostOrderByMaxAverageCommentRating(@Param("limit") Long limit, @Param("offset") Long offset);
+
+
 
     Optional<BlogPost> findByIdAndVisibleTrue(long id);
 }
