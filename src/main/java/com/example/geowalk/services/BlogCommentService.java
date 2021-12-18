@@ -15,6 +15,7 @@ import com.example.geowalk.models.repositories.BlogCommentRepo;
 import com.example.geowalk.models.repositories.BlogPostRepo;
 import com.example.geowalk.models.repositories.UserRepo;
 import com.example.geowalk.utils.ISessionUtil;
+import com.example.geowalk.utils.SwearWordsFilter;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ public class BlogCommentService {
     private static final Logger logger = LoggerFactory.getLogger(BlogCommentService.class);
     private final ModelMapper mapper;
     private final ISessionUtil sessionUtil;
+    private final SwearWordsFilter swearWordsFilter;
 
     private final BlogCommentRepo blogCommentRepo;
     private final BlogPostRepo blogPostRepo;
@@ -46,16 +48,20 @@ public class BlogCommentService {
     private final String BLOG_COMMENT_NOT_FOUND = "Blog comment with given id not found";
     private final String BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER = "User cannot delete comment others users";
     private final String BLOG_POST_NOT_FOUND = "BlogPost with given id not found";
+    private final String BLOG_POST_MISSING_CONTENT_VALUE = "Content value is missing";
+    private final String BLOG_POST_MISSING_RATING_VALUE = "Rating value is missing";
     private final String BLOG_POST_INVALID_RATING_VALUE = "Rating value is invalid";
     private final String USER_NOT_AUTHORIZED = "User is not authenticated/authorized";
     private final String USER_BLOCKED_OR_DELETED = "User is deleted/blocked";
+    private final String SWEAR_WORDS_FILTER_MESSAGE = "Comment moved to verification due to profanity";
 
     @Autowired
-    public BlogCommentService(BlogCommentRepo blogCommentRepo, BlogPostRepo blogPostRepo, UserRepo userRepo, ISessionUtil sessionUtil) {
+    public BlogCommentService(BlogCommentRepo blogCommentRepo, BlogPostRepo blogPostRepo, UserRepo userRepo, ISessionUtil sessionUtil, SwearWordsFilter swearWordsFilter) {
         this.blogCommentRepo = blogCommentRepo;
         this.blogPostRepo = blogPostRepo;
         this.userRepo = userRepo;
         this.sessionUtil = sessionUtil;
+        this.swearWordsFilter = swearWordsFilter;
         mapper = new ModelMapper();
     }
 
@@ -68,7 +74,7 @@ public class BlogCommentService {
 
         List<BlogCommentResponse> result = new ArrayList<>();
         for (BlogComment blogComment : blogPost.get().getBlogComments()) {
-            if (blogComment.isVisible()) {
+            if (blogComment.isVisible() && blogComment.isNeedToVerify()) {
                 UserResDto blogCommentUser = mapper.map(blogComment.getUser(), UserResDto.class);
                 BlogCommentResponse blogCommentResponse = mapper.map(blogComment, BlogCommentResponse.class);
                 blogCommentResponse.setUser(blogCommentUser);
@@ -98,6 +104,16 @@ public class BlogCommentService {
             throw new NotFoundException(BLOG_POST_NOT_FOUND);
         }
 
+        if(request.getContent() == null || request.getContent().isBlank()) {
+            logger.error(LOGGER_CREATE_COMMENT_FAILED + BLOG_POST_MISSING_CONTENT_VALUE);
+            throw new BadRequestException(BLOG_POST_MISSING_CONTENT_VALUE);
+        }
+
+        if (request.getRating() == null) {
+            logger.error(LOGGER_CREATE_COMMENT_FAILED + BLOG_POST_MISSING_RATING_VALUE);
+            throw new BadRequestException(BLOG_POST_MISSING_RATING_VALUE);
+        }
+
         if (request.getRating() < 1 || request.getRating() > 5) {
             logger.error(LOGGER_CREATE_COMMENT_FAILED + BLOG_POST_INVALID_RATING_VALUE);
             throw new BadRequestException(BLOG_POST_INVALID_RATING_VALUE);
@@ -105,8 +121,13 @@ public class BlogCommentService {
         BlogComment blogComment = mapper.map(request, BlogComment.class);
         blogComment.setUser(loggedUser.get());
         blogComment.setBlogPost(blogPost.get());
+
+        if (swearWordsFilter.hasSwearWord(request.getContent())) {
+            blogComment.setNeedToVerify(true);
+        }
+        boolean needToVerify = blogComment.isNeedToVerify();
         blogCommentRepo.save(blogComment);
-        logger.info("Creating comment success");
+        logger.info(needToVerify ? SWEAR_WORDS_FILTER_MESSAGE : "Creating comment success");
     }
 
     public void updateBlogComment(long blogCommentId, BlogCommentReqDto request) {
@@ -149,8 +170,12 @@ public class BlogCommentService {
             blogComment.get().setRating(request.getRating());
         }
 
+        if (swearWordsFilter.hasSwearWord(request.getContent())) {
+            blogComment.get().setNeedToVerify(true);
+        }
+        boolean needToVerify = blogComment.get().isNeedToVerify();
         blogCommentRepo.save(blogComment.get());
-        logger.info("Updating comment success");
+        logger.info(needToVerify ? SWEAR_WORDS_FILTER_MESSAGE : "Updating comment success");
     }
 
     public void deleteBlogComment(long blogCommentId) {
