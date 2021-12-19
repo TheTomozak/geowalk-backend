@@ -4,7 +4,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 public class BlogPost extends EntityBase {
@@ -20,6 +19,9 @@ public class BlogPost extends EntityBase {
 
     @Column(nullable = true)
     private LocalDateTime lastEditDateTime;
+
+    @Column(nullable = false)
+    private boolean needToVerify = false;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "user_id")
@@ -147,6 +149,14 @@ public class BlogPost extends EntityBase {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public boolean isNeedToVerify() {
+        return needToVerify;
+    }
+
+    public void setNeedToVerify(boolean needToVerify) {
+        this.needToVerify = needToVerify;
     }
 
     public Double rateAverage(){

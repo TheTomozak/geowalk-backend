@@ -10,6 +10,7 @@ import com.example.geowalk.models.entities.*;
 import com.example.geowalk.models.repositories.BlogPostRepo;
 import com.example.geowalk.models.repositories.TravelRouteRepo;
 import com.example.geowalk.models.repositories.TravelStopRepo;
+import com.example.geowalk.utils.SwearWordsFilter;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ public class BlogPostService {
 
     private ModelMapper mapper = new ModelMapper();
     private static final Logger logger = LoggerFactory.getLogger(BlogPostService.class);
+    private final SwearWordsFilter swearWordsFilter;
 
     private final String LOGGER_GET_BLOGPOST_FAILED = "Getting BlogPost failed:\t";
     private final String LOGGER_CREATE_BLOGPOST_FAILED = "Creating BlogPost failed:\t";
@@ -49,9 +51,10 @@ public class BlogPostService {
 
     private final String NOT_FOUND_BLOG_POST = "Blog post with given id not found";
     private final String BAD_REQUEST_BLOG_POST = "Blog post request has bad body";
+    private final String SWEAR_WORDS_FILTER_MESSAGE = "Post moved to verification due to profanity";
     private final TagService tagRepo;
 
-    public BlogPostService(BlogPostRepo blogPostRepository, TravelRouteRepo travelRouteRepository, TravelStopRepo travelStopRepository, UserService userService, TravelStopService travelStopService, TravelRouteService travelRouteService, TagService tagService, TagService tagRepo) {
+    public BlogPostService(BlogPostRepo blogPostRepository, TravelRouteRepo travelRouteRepository, TravelStopRepo travelStopRepository, UserService userService, TravelStopService travelStopService, TravelRouteService travelRouteService, TagService tagService, SwearWordsFilter swearWordsFilter, TagService tagRepo) {
         this.blogPostRepository = blogPostRepository;
         this.travelRouteRepository = travelRouteRepository;
         this.travelStopRepository = travelStopRepository;
@@ -59,6 +62,7 @@ public class BlogPostService {
         this.travelStopService = travelStopService;
         this.travelRouteService = travelRouteService;
         this.tagService = tagService;
+        this.swearWordsFilter = swearWordsFilter;
         this.tagRepo = tagRepo;
     }
 
@@ -113,7 +117,12 @@ public class BlogPostService {
 
         // TODO: 05.12.2021 Dodawanie zdjęć
 
+        if(swearWordsFilter.hasSwearWord(toCreate.getContent())) {
+            blogPost.setNeedToVerify(true);
+        }
+        boolean needToVerify = blogPost.isNeedToVerify();
         blogPostRepository.save(blogPost);
+        logger.info(needToVerify ? SWEAR_WORDS_FILTER_MESSAGE : "Creating post success");
     }
 
 

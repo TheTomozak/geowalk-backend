@@ -50,17 +50,18 @@ values ('Wycieczka po Warszawie', 'MEDIUM', 'Trasa dla osób odwiedzających War
        ('Egipt', 'EASY', 'Latwa trasa po Egipcie, autokarem', true),                         --3
        ('Amerykanski Sen', 'HARD', 'Zwiedzanie LA w USA!', true); --4
 
-insert into blog_post (title, content, creation_date_time, last_edit_date_time, user_id, visible, number_of_visits)
-values ('Amerykańskia Warszawa', 'Przechadzka po Warszawie. Nauka-zakupy-spacer', '2021-08-09', null, 4, true, 1), --1
-       ('Tytuł', 'Ciekawa i historyczna wycieczka po Zamku.', '2021-08-15', null, 3, true, 2),                     --2
+insert into blog_post (title, content, creation_date_time, last_edit_date_time, user_id, visible, number_of_visits,
+                       need_to_verify)
+values ('Amerykańskia Warszawa', 'Przechadzka po Warszawie. Nauka-zakupy-spacer', '2021-08-09', null, 4, true, 1,
+        false),                                                                                       --1
+       ('Tytuł', 'Ciekawa i historyczna wycieczka po Zamku.', '2021-08-15', null, 3, true, 2, false), --2
        ('Tytułowy', 'Dzisiaj byłem w Watykanie. Swietne miejsce, daje dużo do myślenia!', '2021-07-15', null, 1, true,
-        3),                                                                                                        --3
+        3, false),                                                                                    --3
        ('MEGA Tytuł', 'Niesamowicie bylo zwiedzic chociaz troche Egipt. Wycieczka Quadami mega.', '2021-07-01', null,
-        2,
-        true, 2),                                                                                                  --4
+        2, true, 2, false),                                                                           --4
        ('Ameryka', 'Bardzo Amerykanskie i bardzo ciekawe przystanki. Zachecam do czytania dalej.', '2021-06-09', null,
-        3, true, 66),                                                                                              --5
-       ('Warszawa ale jednak nie', 'Kasyno w kozackim stylu.', '2021-08-10', null, 4, true, 7); --6
+        3, true, 66, false),                                                                          --5
+       ('Warszawa ale jednak nie', 'Kasyno w kozackim stylu.', '2021-08-10', null, 4, true, 7, false); --6
 
 insert into blog_comment(content, creation_date_time, rating, user_id, visible, blog_post_id, need_to_verify)
 values ('Ciekawa trasa!', '2021-09-15', 4, 1, true, 1, false),                        --1
