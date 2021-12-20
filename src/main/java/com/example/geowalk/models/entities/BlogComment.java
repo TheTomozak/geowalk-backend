@@ -15,6 +15,9 @@ public class BlogComment extends EntityBase {
     @Column(nullable = false)
     private int rating;
 
+    @Column(nullable = false)
+    private boolean needToVerify = false;
+
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "user_id")
     private User user;
@@ -65,5 +68,13 @@ public class BlogComment extends EntityBase {
 
     public void setBlogPost(BlogPost blogPost) {
         this.blogPost = blogPost;
+    }
+
+    public boolean isNeedToVerify() {
+        return needToVerify;
+    }
+
+    public void setNeedToVerify(boolean needToVerify) {
+        this.needToVerify = needToVerify;
     }
 }
