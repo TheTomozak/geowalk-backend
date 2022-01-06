@@ -1,8 +1,8 @@
 package com.example.geowalk.controllers;
 
 import com.example.geowalk.models.dto.requests.BlogCommentReqDto;
+import com.example.geowalk.models.dto.requests.BlogCommentVerificationReqDto;
 import com.example.geowalk.models.dto.responses.BlogCommentResponse;
-import com.example.geowalk.models.entities.BlogComment;
 import com.example.geowalk.services.BlogCommentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +13,10 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-@RequestMapping("api/comment")
+@RequestMapping("api/comments")
 public class BlogCommentController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(BlogCommentController.class);
     private final BlogCommentService blogCommentService;
 
     @Autowired
@@ -26,25 +26,43 @@ public class BlogCommentController {
 
     @GetMapping("/{blogPostId}")
     public List<BlogCommentResponse> getBlogComments(@PathVariable("blogPostId") long blogId) {
-        logger.info(String.format("BlogCommentController GET[api/comment/%s] Getting comments related to blogPost with id >>\t%s\t<<", blogId, blogId));
+        logger.info("GET[api/comments/{}] Getting comments related to blogPost with id {}", blogId, blogId);
         return blogCommentService.getBlogComments(blogId);
     }
 
     @PostMapping("/{blogPostId}")
     public void createBlogComment(@PathVariable("blogPostId") long blogPostId, @RequestBody BlogCommentReqDto request) {
-        logger.info(String.format("BlogCommentController POST[api/comment/%s] Creating comment related to blogPost with id >>\t%s\t<<", blogPostId, blogPostId));
+        logger.info("POST[api/comments/{}] Creating comment related to blogPost with id {}", blogPostId, blogPostId);
         blogCommentService.createBlogComment(blogPostId, request);
     }
 
     @PutMapping("/{blogCommentId}")
     public void updateBlogComment(@PathVariable("blogCommentId") long blogCommentId, @RequestBody BlogCommentReqDto request) {
-        logger.info(String.format("BlogCommentController PUT[api/comment/%s] Updating comment with id >>\t%s\t<<", blogCommentId, blogCommentId));
+        logger.info("PUT[api/comments/{}] Updating comment with id {}", blogCommentId, blogCommentId);
         blogCommentService.updateBlogComment(blogCommentId, request);
     }
 
     @DeleteMapping("/{blogCommentId}")
     public void deleteBlogComment(@PathVariable("blogCommentId") long blogCommentId) {
-        logger.info(String.format("BlogCommentController DELETE[api/comment/%s] Deleting comment with id >>\t%s\t<<", blogCommentId, blogCommentId));
+        logger.info("DELETE[api/comments/{}] Deleting comment with id {}", blogCommentId, blogCommentId);
         blogCommentService.deleteBlogComment(blogCommentId);
+    }
+
+    /*
+        ***********************
+        * Moderator endpoints *
+        ***********************
+    */
+
+    @GetMapping("/verify")
+    public List<BlogCommentResponse> getBlogCommentsToVerify() {
+        logger.info("GET[api/comments/verify] Getting comments to verify");
+        return blogCommentService.getBlogCommentsToVerify();
+    }
+
+    @PostMapping("/verify")
+    public void verifyBlogComment(@RequestBody BlogCommentVerificationReqDto request) {
+        logger.info("POST[api/comments/verify] Verifying comment with id {}", request.getBlogCommentId());
+        blogCommentService.verifyBlogComment(request);
     }
 }
