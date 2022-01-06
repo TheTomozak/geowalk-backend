@@ -116,8 +116,8 @@ public class BlogCommentService {
         }
 
         if (request.getRating() < 1 || request.getRating() > 5) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_COMMENT_FAILED), dict.getDict().get(BLOG_POST_INVALID_RATING_VALUE));
-            throw new BadRequestException(dict.getDict().get(BLOG_POST_INVALID_RATING_VALUE));
+            logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_COMMENT_FAILED), dict.getDict().get(BLOG_COMMENT_INVALID_RATING_VALUE));
+            throw new BadRequestException(dict.getDict().get(BLOG_COMMENT_INVALID_RATING_VALUE));
         }
 
         BlogComment blogComment = mapper.map(request, BlogComment.class);
@@ -166,8 +166,8 @@ public class BlogCommentService {
 
         if (request.getRating() != null) {
             if (request.getRating() < 1 || request.getRating() > 5) {
-                logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_COMMENT_FAILED), dict.getDict().get(BLOG_POST_INVALID_RATING_VALUE));
-                throw new BadRequestException(dict.getDict().get(BLOG_POST_INVALID_RATING_VALUE));
+                logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_COMMENT_FAILED), dict.getDict().get(BLOG_COMMENT_INVALID_RATING_VALUE));
+                throw new BadRequestException(dict.getDict().get(BLOG_COMMENT_INVALID_RATING_VALUE));
             }
             blogComment.get().setRating(request.getRating());
         }

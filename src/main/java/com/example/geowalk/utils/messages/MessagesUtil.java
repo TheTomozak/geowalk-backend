@@ -19,6 +19,10 @@ public class MessagesUtil {
             put(LOGGER_UPDATE_USER_FAILED, "Update user failed: ");
             put(LOGGER_DELETE_USER_FAILED, "Delete user failed: ");
 
+            put(LOGGER_GET_POST_FAILED, "Getting posts failed: ");
+            put(LOGGER_CREATE_POST_FAILED, "Creating post failed: ");
+            put(LOGGER_UPDATE_POST_FAILED, "Updating post failed: ");
+
             put(LOGGER_GET_COMMENT_FAILED, "Getting comments failed: ");
             put(LOGGER_CREATE_COMMENT_FAILED, "Creating comment failed: ");
             put(LOGGER_UPDATE_COMMENT_FAILED, "Updating comment failed: ");
@@ -32,9 +36,10 @@ public class MessagesUtil {
 
             put(BLOG_COMMENT_NOT_FOUND, "Blog comment with given id not found");
             put(BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER, "User cannot delete comment others users");
+            put(BLOG_COMMENT_INVALID_RATING_VALUE, "Rating value is invalid");
 
             put(BLOG_POST_NOT_FOUND, "BlogPost with given id not found");
-            put(BLOG_POST_INVALID_RATING_VALUE, "Rating value is invalid");
+            put(BLOG_POST_BAD_REQUEST, "BlogPost request has bad body");
 
             put(EMAIL_ALREADY_IN_USE, "Email is already in use");
             put(INVALID_RESULT_VALUE, "Invalid result value");

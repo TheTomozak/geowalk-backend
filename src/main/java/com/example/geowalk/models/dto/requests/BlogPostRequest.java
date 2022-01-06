@@ -1,9 +1,6 @@
 package com.example.geowalk.models.dto.requests;
 
-import com.example.geowalk.models.entities.Tag;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class BlogPostRequest {
@@ -13,9 +10,6 @@ public class BlogPostRequest {
 
     @NotBlank
     private String content;
-
-    @NotNull
-    private Long userId;
 
     private List<TravelRouteRequest> travelRouteRequestList;
 
@@ -46,14 +40,6 @@ public class BlogPostRequest {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public List<TravelRouteRequest> getTravelRouteRequestList() {

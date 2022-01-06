@@ -2,15 +2,16 @@ package com.example.geowalk.services;
 
 import com.example.geowalk.exceptions.BadRequestException;
 import com.example.geowalk.exceptions.NotFoundException;
+import com.example.geowalk.exceptions.UnauthorizedException;
 import com.example.geowalk.models.dto.ObjectMapperUtils;
 import com.example.geowalk.models.dto.requests.BlogPostRequest;
 import com.example.geowalk.models.dto.responses.BlogPostResponse;
 import com.example.geowalk.models.dto.responses.BlogPostShortcutResponse;
 import com.example.geowalk.models.entities.*;
-import com.example.geowalk.models.repositories.BlogPostRepo;
-import com.example.geowalk.models.repositories.TravelRouteRepo;
-import com.example.geowalk.models.repositories.TravelStopRepo;
+import com.example.geowalk.models.repositories.*;
+import com.example.geowalk.utils.ISessionUtil;
 import com.example.geowalk.utils.SwearWordsFilter;
+import com.example.geowalk.utils.messages.MessagesUtil;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,102 +26,72 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.example.geowalk.utils.messages.MessageKeys.*;
+
 @Transactional
 @Service
 public class BlogPostService {
 
-    private final BlogPostRepo blogPostRepository;
-    private final TravelRouteRepo travelRouteRepository;
-    private final TravelStopRepo travelStopRepository;
+    private static final Logger logger = LoggerFactory.getLogger(BlogPostService.class);
+
+    private final ModelMapper mapper;
+    private final SwearWordsFilter swearWordsFilter;
+    private final MessagesUtil dict;
+    private final ISessionUtil sessionUtil;
+
     private final UserService userService;
     private final TravelStopService travelStopService;
     private final TravelRouteService travelRouteService;
     private final TagService tagService;
 
-    private ModelMapper mapper = new ModelMapper();
-    private static final Logger logger = LoggerFactory.getLogger(BlogPostService.class);
-    private final SwearWordsFilter swearWordsFilter;
+    private final BlogPostRepo blogPostRepo;
+    private final TravelRouteRepo travelRouteRepo;
+    private final TravelStopRepo travelStopRepo;
+    private final UserRepo userRepo;
 
-    private final String LOGGER_GET_BLOGPOST_FAILED = "Getting BlogPost failed:\t";
-    private final String LOGGER_CREATE_BLOGPOST_FAILED = "Creating BlogPost failed:\t";
-    private final String LOGGER_UPDATE_BLOGPOST_FAILED = "Updating BlogPost failed:\t";
-    private final String LOGGER_DELETE_BLOGPOST_FAILED = "Deleting BlogPost failed:\t";
-
-    private final String NOT_FOUND_BLOG_POST = "Blog post with given id not found";
-    private final String BAD_REQUEST_BLOG_POST = "Blog post request has bad body";
-    private final String SWEAR_WORDS_FILTER_MESSAGE = "Post moved to verification due to profanity";
-    private final TagService tagRepo;
-
-    public BlogPostService(BlogPostRepo blogPostRepository, TravelRouteRepo travelRouteRepository, TravelStopRepo travelStopRepository, UserService userService, TravelStopService travelStopService, TravelRouteService travelRouteService, TagService tagService, SwearWordsFilter swearWordsFilter, TagService tagRepo) {
-        this.blogPostRepository = blogPostRepository;
-        this.travelRouteRepository = travelRouteRepository;
-        this.travelStopRepository = travelStopRepository;
+    public BlogPostService(ModelMapper mapper,
+                           MessagesUtil dict,
+                           ISessionUtil sessionUtil,
+                           BlogPostRepo blogPostRepository,
+                           TravelRouteRepo travelRouteRepository,
+                           TravelStopRepo travelStopRepository,
+                           UserService userService,
+                           TravelStopService travelStopService,
+                           TravelRouteService travelRouteService,
+                           TagService tagService,
+                           SwearWordsFilter swearWordsFilter,
+                           UserRepo userRepo) {
+        this.mapper = mapper;
+        this.dict = dict;
+        this.sessionUtil = sessionUtil;
+        this.blogPostRepo = blogPostRepository;
+        this.travelRouteRepo = travelRouteRepository;
+        this.travelStopRepo = travelStopRepository;
         this.userService = userService;
         this.travelStopService = travelStopService;
         this.travelRouteService = travelRouteService;
         this.tagService = tagService;
         this.swearWordsFilter = swearWordsFilter;
-        this.tagRepo = tagRepo;
+        this.userRepo = userRepo;
     }
 
-    public void createBlogPost(BlogPostRequest toCreate) {
+    public Page<BlogPostShortcutResponse> getBlogPostsByPageAndSort(int offset, int pageSize, String column) {
 
-        User user = userService.getUser(toCreate.getUserId());
-
-        BlogPost blogPost = new BlogPost(
-                toCreate.getContent(),
-                toCreate.getTitle()
-        );
-        blogPost.setUser(user);
-
-        if (toCreate.getTravelRouteRequestList() != null && toCreate.getTravelStopRequestList() != null) {
-            logger.warn(LOGGER_GET_BLOGPOST_FAILED + BAD_REQUEST_BLOG_POST);
-            throw new BadRequestException(BAD_REQUEST_BLOG_POST);
-        }
-
-        if (toCreate.getTravelRouteRequestList() != null) {
-            List<TravelRoute> travelRouteList = new ArrayList<>();
-            toCreate.getTravelRouteRequestList().forEach(e -> {
-                if (e.getTravelStopList().size() < 2) {
-                    logger.warn(LOGGER_GET_BLOGPOST_FAILED + BAD_REQUEST_BLOG_POST);
-                    throw new BadRequestException(BAD_REQUEST_BLOG_POST);
-                }
-                travelRouteList.add(travelRouteService.createTravelRoute(e));
-            });
-            travelRouteRepository.saveAll(travelRouteList);
-            blogPost.getTravelRoutes().addAll(travelRouteList);
-        } else if (toCreate.getTravelStopRequestList() != null) {
-            List<TravelStop> travelStopList = new ArrayList<>(travelStopService.getOrCreateTravelStopsByLocation(toCreate.getTravelStopRequestList()));
-            blogPost.getTravelStops().addAll(travelStopList);
-        }
-
-        if (toCreate.getTagList() != null) {
-            List<Tag> tagList = new ArrayList<>();
-            List<Tag> newTagList = new ArrayList<>();
-            toCreate.getTagList().forEach(e -> {
-                Tag tag = tagService.findTagByName(e);
-                if (tag != null)
-                    tagList.add(tag);
-                else {
-                    tag = new Tag(e);
-                    newTagList.add(tag);
-                }
-            });
-            tagService.saveAll(newTagList);
-            tagList.addAll(newTagList);
-            blogPost.getTags().addAll(tagList);
-        }
-
-        // TODO: 05.12.2021 Dodawanie zdjęć
-
-        if(swearWordsFilter.hasSwearWord(toCreate.getContent())) {
-            blogPost.setNeedToVerify(true);
-        }
-        boolean needToVerify = blogPost.isNeedToVerify();
-        blogPostRepository.save(blogPost);
-        logger.info(needToVerify ? SWEAR_WORDS_FILTER_MESSAGE : "Creating post success");
+        Page<BlogPost> returnPageList = blogPostRepo.findAll(PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.ASC, column)));
+        return returnPageList.map(new Function<BlogPost, BlogPostShortcutResponse>() {
+            @Override
+            public BlogPostShortcutResponse apply(BlogPost blogPost) {
+                BlogPostShortcutResponse bpSR = mapper.map(blogPost, BlogPostShortcutResponse.class);
+                bpSR.setRateAverage(blogPost.rateAverage());
+                return bpSR;
+            }
+        });
     }
 
+    public Page<BlogPostShortcutResponse> getTopRatedBlogPosts(int page, int howManyRecord) {
+        List<BlogPost> listBP = findAllBlogPost().stream().sorted(Comparator.comparingDouble(BlogPost::rateAverage).reversed()).collect(Collectors.toList());
+        return returnMappedPageBlogPostShortcutResponse(listBP, page, howManyRecord);
+    }
 
     public Page<BlogPostShortcutResponse> getBlogPostsAboutTravelStopByName(String country, String city, String street, int page, int howManyRecord) {
 
@@ -175,7 +146,7 @@ public class BlogPostService {
             return returnMappedPageBlogPostShortcutResponse(blogPostList, page, howManyRecord);
 
         } else if (titleParam != null) {
-            Page<BlogPostShortcutResponse> blogPostList = blogPostRepository.findAllByTitleContainingIgnoreCase(titleParam, PageRequest.of(page, howManyRecord))
+            Page<BlogPostShortcutResponse> blogPostList = blogPostRepo.findAllByTitleContainingIgnoreCase(titleParam, PageRequest.of(page, howManyRecord))
                     .map(new Function<BlogPost, BlogPostShortcutResponse>() {
                         @Override
                         public BlogPostShortcutResponse apply(BlogPost blogPost) {
@@ -188,24 +159,78 @@ public class BlogPostService {
         return new PageImpl<BlogPostShortcutResponse>(Collections.emptyList(), PageRequest.of(page, howManyRecord), 0);
     }
 
-    public Page<BlogPostShortcutResponse> getTopRatedBlogPosts(int page, int howManyRecord) {
-        List<BlogPost> listBP = findAllBlogPost().stream().sorted(Comparator.comparingDouble(BlogPost::rateAverage).reversed()).collect(Collectors.toList());
-        return returnMappedPageBlogPostShortcutResponse(listBP, page, howManyRecord);
+    public BlogPostResponse getBlogPostById(Long blogPostId) {
+        BlogPost bP = findBlogPostById(blogPostId, dict.getDict().get(LOGGER_GET_POST_FAILED));
+        bP.setNumberOfVisits(bP.getNumberOfVisits() + 1);
+        return map(bP);
     }
 
-    public Page<BlogPostShortcutResponse> getBlogPostsByPageAndSort(int offset, int pageSize, String column) {
+    public void createBlogPost(BlogPostRequest request) {
+        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
+        if (loggedUserUsername.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
+            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
+        }
 
-        Page<BlogPost> returnPageList = blogPostRepository.findAll(PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.ASC, column)));
-        return returnPageList.map(new Function<BlogPost, BlogPostShortcutResponse>() {
-            @Override
-            public BlogPostShortcutResponse apply(BlogPost blogPost) {
-                BlogPostShortcutResponse bpSR = mapper.map(blogPost, BlogPostShortcutResponse.class);
-                bpSR.setRateAverage(blogPost.rateAverage());
-                return bpSR;
-            }
-        });
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        if (loggedUser.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_COMMENT_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
+            throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
+        }
+
+        BlogPost blogPost = new BlogPost(
+                request.getContent(),
+                request.getTitle()
+        );
+        blogPost.setUser(loggedUser.get());
+
+        if (request.getTravelRouteRequestList() != null && request.getTravelStopRequestList() != null) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_POST_FAILED), dict.getDict().get(BLOG_POST_BAD_REQUEST));
+            throw new BadRequestException(dict.getDict().get(BLOG_POST_BAD_REQUEST));
+        }
+
+        if (request.getTravelRouteRequestList() != null) {
+            List<TravelRoute> travelRouteList = new ArrayList<>();
+            request.getTravelRouteRequestList().forEach(e -> {
+                if (e.getTravelStopList().size() < 2) {
+                    logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_POST_FAILED), dict.getDict().get(BLOG_POST_BAD_REQUEST));
+                    throw new BadRequestException(dict.getDict().get(BLOG_POST_BAD_REQUEST));
+                }
+                travelRouteList.add(travelRouteService.createTravelRoute(e));
+            });
+            travelRouteRepo.saveAll(travelRouteList);
+            blogPost.getTravelRoutes().addAll(travelRouteList);
+        } else if (request.getTravelStopRequestList() != null) {
+            List<TravelStop> travelStopList = new ArrayList<>(travelStopService.getOrCreateTravelStopsByLocation(request.getTravelStopRequestList()));
+            blogPost.getTravelStops().addAll(travelStopList);
+        }
+
+        if (request.getTagList() != null) {
+            List<Tag> tagList = new ArrayList<>();
+            List<Tag> newTagList = new ArrayList<>();
+            request.getTagList().forEach(e -> {
+                Tag tag = tagService.findTagByName(e);
+                if (tag != null)
+                    tagList.add(tag);
+                else {
+                    tag = new Tag(e);
+                    newTagList.add(tag);
+                }
+            });
+            tagService.saveAll(newTagList);
+            tagList.addAll(newTagList);
+            blogPost.getTags().addAll(tagList);
+        }
+
+        // TODO: 05.12.2021 Dodawanie zdjęć
+
+        if (swearWordsFilter.hasSwearWord(request.getContent())) {
+            blogPost.setNeedToVerify(true);
+        }
+        blogPostRepo.save(blogPost);
+        logger.info(blogPost.isNeedToVerify() ? dict.getDict().get(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST) : "Creating post success");
     }
-
+    
     private BlogPostResponse map(BlogPost blogPost) {
 
         BlogPostResponse bpR = mapper.map(blogPost, BlogPostResponse.class);
@@ -214,18 +239,13 @@ public class BlogPostService {
     }
 
     public BlogPost findBlogPostById(Long blogPostId, String loggerMsg) {
-        return blogPostRepository.findById(blogPostId)
+        return blogPostRepo.findById(blogPostId)
                 .orElseThrow(() -> throwExcWithLogger(loggerMsg));
     }
 
-    public BlogPostResponse getBlogPostById(Long blogPostId) {
-        BlogPost bP = findBlogPostById(blogPostId, LOGGER_GET_BLOGPOST_FAILED);
-        bP.setNumberOfVisits(bP.getNumberOfVisits() + 1);
-        return map(bP);
-    }
 
     public List<BlogPost> findAllBlogPost() {
-        return blogPostRepository.findAll();
+        return blogPostRepo.findAll();
     }
 
     private List<BlogPostResponse> mapAll(List<BlogPost> blogPostList) {
@@ -233,8 +253,8 @@ public class BlogPostService {
     }
 
     private NotFoundException throwExcWithLogger(String loggerMsg) {
-        logger.warn(loggerMsg + NOT_FOUND_BLOG_POST);
-        return new NotFoundException(NOT_FOUND_BLOG_POST);
+        logger.error("{}{}", loggerMsg, dict.getDict().get(BLOG_POST_NOT_FOUND));
+        return new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));
     }
 
     private Page<BlogPostShortcutResponse> returnMappedPageBlogPostShortcutResponse(List<BlogPost> listBlogPost, int page, int howManyRecord) {
