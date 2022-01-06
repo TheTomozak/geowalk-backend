@@ -188,12 +188,12 @@ public class BlogPostService {
         return new PageImpl<BlogPostShortcutResponse>(Collections.emptyList(), PageRequest.of(page, howManyRecord), 0);
     }
 
-    public Page<BlogPostShortcutResponse> getTopRatedBlogPost(int page, int howManyRecord) {
+    public Page<BlogPostShortcutResponse> getTopRatedBlogPosts(int page, int howManyRecord) {
         List<BlogPost> listBP = findAllBlogPost().stream().sorted(Comparator.comparingDouble(BlogPost::rateAverage).reversed()).collect(Collectors.toList());
         return returnMappedPageBlogPostShortcutResponse(listBP, page, howManyRecord);
     }
 
-    public Page<BlogPostShortcutResponse> getBlogPostByPageAndSort(int offset, int pageSize, String column) {
+    public Page<BlogPostShortcutResponse> getBlogPostsByPageAndSort(int offset, int pageSize, String column) {
 
         Page<BlogPost> returnPageList = blogPostRepository.findAll(PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.ASC, column)));
         return returnPageList.map(new Function<BlogPost, BlogPostShortcutResponse>() {
