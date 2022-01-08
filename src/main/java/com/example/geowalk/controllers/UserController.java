@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
     public List<UserResDto> getUsers() {
         logger.info("GET[api/users] Getting all users");
         List<User> users = userService.getUsers();
@@ -57,12 +59,14 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'MODERATOR', 'ADMIN')")
     public void updateUser(@PathVariable("userId") long userId, @RequestBody UserReqDto request) {
         logger.info("PUT[api/users/{}] Updating user with id {}", userId, userId);
         userService.updateUser(userId, request);
     }
 
     @DeleteMapping("/{userId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'MODERATOR', 'ADMIN')")
     public void deleteUser(@PathVariable long userId) {
         logger.info("DELETE[api/users/{}] Deleting user with id {}", userId, userId);
         userService.deleteUser(userId);

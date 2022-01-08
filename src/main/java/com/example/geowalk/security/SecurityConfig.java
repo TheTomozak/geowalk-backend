@@ -13,10 +13,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -54,11 +52,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/").permitAll()
                 .antMatchers("/console/**").permitAll()
                 .antMatchers("/swagger-ui/#/*").permitAll()
                 .antMatchers("/login").permitAll()
-                .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(authenticationFilter(), AuthenticationWithJsonFilter.class)
                 .exceptionHandling()
