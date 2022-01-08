@@ -4,9 +4,9 @@ import com.example.geowalk.exceptions.BadRequestException;
 import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.exceptions.UnauthorizedException;
 import com.example.geowalk.models.dto.ObjectMapperUtils;
-import com.example.geowalk.models.dto.requests.BlogPostRequest;
-import com.example.geowalk.models.dto.responses.BlogPostResponse;
-import com.example.geowalk.models.dto.responses.BlogPostShortcutResponse;
+import com.example.geowalk.models.dto.requests.BlogPostReqDto;
+import com.example.geowalk.models.dto.responses.BlogPostResDto;
+import com.example.geowalk.models.dto.responses.BlogPostShortResDto;
 import com.example.geowalk.models.entities.*;
 import com.example.geowalk.models.repositories.*;
 import com.example.geowalk.utils.ISessionUtil;
@@ -75,25 +75,25 @@ public class BlogPostService {
         this.userRepo = userRepo;
     }
 
-    public Page<BlogPostShortcutResponse> getBlogPostsByPageAndSort(int offset, int pageSize, String column) {
+    public Page<BlogPostShortResDto> getBlogPostsByPageAndSort(int offset, int pageSize, String column) {
 
         Page<BlogPost> returnPageList = blogPostRepo.findAll(PageRequest.of(offset, pageSize, Sort.by(Sort.Direction.ASC, column)));
-        return returnPageList.map(new Function<BlogPost, BlogPostShortcutResponse>() {
+        return returnPageList.map(new Function<BlogPost, BlogPostShortResDto>() {
             @Override
-            public BlogPostShortcutResponse apply(BlogPost blogPost) {
-                BlogPostShortcutResponse bpSR = mapper.map(blogPost, BlogPostShortcutResponse.class);
+            public BlogPostShortResDto apply(BlogPost blogPost) {
+                BlogPostShortResDto bpSR = mapper.map(blogPost, BlogPostShortResDto.class);
                 bpSR.setRateAverage(blogPost.rateAverage());
                 return bpSR;
             }
         });
     }
 
-    public Page<BlogPostShortcutResponse> getTopRatedBlogPosts(int page, int howManyRecord) {
+    public Page<BlogPostShortResDto> getTopRatedBlogPosts(int page, int howManyRecord) {
         List<BlogPost> listBP = findAllBlogPost().stream().sorted(Comparator.comparingDouble(BlogPost::rateAverage).reversed()).collect(Collectors.toList());
         return returnMappedPageBlogPostShortcutResponse(listBP, page, howManyRecord);
     }
 
-    public Page<BlogPostShortcutResponse> getBlogPostsAboutTravelStopByName(String country, String city, String street, int page, int howManyRecord) {
+    public Page<BlogPostShortResDto> getBlogPostsAboutTravelStopByName(String country, String city, String street, int page, int howManyRecord) {
 
 
         List<TravelStop> travelStop = travelStopService.getAllTravelStopByLocation(country, city, street);
@@ -106,7 +106,7 @@ public class BlogPostService {
         return returnMappedPageBlogPostShortcutResponse(listBlogPost, page, howManyRecord);
     }
 
-    public Page<BlogPostShortcutResponse> getAllBlogPostAboutTravelRouteByTravelStopLocationName(String country, String city, String street, int page, int howManyRecord) {
+    public Page<BlogPostShortResDto> getAllBlogPostAboutTravelRouteByTravelStopLocationName(String country, String city, String street, int page, int howManyRecord) {
 
         List<TravelStop> travelStop = travelStopService.getAllTravelStopByLocation(country, city, street);
 
@@ -118,7 +118,7 @@ public class BlogPostService {
         return returnMappedPageBlogPostShortcutResponse(listBlogPost, page, howManyRecord);
     }
 
-    public Page<BlogPostShortcutResponse> getAllBlogPostByTitleAndTags(int page, int howManyRecord, List<String> tagListParam, String titleParam) {
+    public Page<BlogPostShortResDto> getAllBlogPostByTitleAndTags(int page, int howManyRecord, List<String> tagListParam, String titleParam) {
 
         if (titleParam != null && tagListParam != null) {
             List<Tag> tagList = new ArrayList<>();
@@ -146,26 +146,26 @@ public class BlogPostService {
             return returnMappedPageBlogPostShortcutResponse(blogPostList, page, howManyRecord);
 
         } else if (titleParam != null) {
-            Page<BlogPostShortcutResponse> blogPostList = blogPostRepo.findAllByTitleContainingIgnoreCase(titleParam, PageRequest.of(page, howManyRecord))
-                    .map(new Function<BlogPost, BlogPostShortcutResponse>() {
+            Page<BlogPostShortResDto> blogPostList = blogPostRepo.findAllByTitleContainingIgnoreCase(titleParam, PageRequest.of(page, howManyRecord))
+                    .map(new Function<BlogPost, BlogPostShortResDto>() {
                         @Override
-                        public BlogPostShortcutResponse apply(BlogPost blogPost) {
-                            BlogPostShortcutResponse bpSR = mapper.map(blogPost, BlogPostShortcutResponse.class);
+                        public BlogPostShortResDto apply(BlogPost blogPost) {
+                            BlogPostShortResDto bpSR = mapper.map(blogPost, BlogPostShortResDto.class);
                             bpSR.setRateAverage(blogPost.rateAverage());
                             return bpSR;
                         }
                     });
         }
-        return new PageImpl<BlogPostShortcutResponse>(Collections.emptyList(), PageRequest.of(page, howManyRecord), 0);
+        return new PageImpl<BlogPostShortResDto>(Collections.emptyList(), PageRequest.of(page, howManyRecord), 0);
     }
 
-    public BlogPostResponse getBlogPostById(Long blogPostId) {
+    public BlogPostResDto getBlogPostById(Long blogPostId) {
         BlogPost bP = findBlogPostById(blogPostId, dict.getDict().get(LOGGER_GET_POST_FAILED));
         bP.setNumberOfVisits(bP.getNumberOfVisits() + 1);
         return map(bP);
     }
 
-    public void createBlogPost(BlogPostRequest request) {
+    public void createBlogPost(BlogPostReqDto request) {
         Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
         if (loggedUserUsername.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
@@ -231,9 +231,9 @@ public class BlogPostService {
         logger.info(blogPost.isNeedToVerify() ? dict.getDict().get(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST) : "Creating post success");
     }
     
-    private BlogPostResponse map(BlogPost blogPost) {
+    private BlogPostResDto map(BlogPost blogPost) {
 
-        BlogPostResponse bpR = mapper.map(blogPost, BlogPostResponse.class);
+        BlogPostResDto bpR = mapper.map(blogPost, BlogPostResDto.class);
         bpR.setRateAverage(blogPost.rateAverage());
         return bpR;
     }
@@ -248,8 +248,8 @@ public class BlogPostService {
         return blogPostRepo.findAll();
     }
 
-    private List<BlogPostResponse> mapAll(List<BlogPost> blogPostList) {
-        return ObjectMapperUtils.mapAll(blogPostList, BlogPostResponse.class);
+    private List<BlogPostResDto> mapAll(List<BlogPost> blogPostList) {
+        return ObjectMapperUtils.mapAll(blogPostList, BlogPostResDto.class);
     }
 
     private NotFoundException throwExcWithLogger(String loggerMsg) {
@@ -257,7 +257,7 @@ public class BlogPostService {
         return new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));
     }
 
-    private Page<BlogPostShortcutResponse> returnMappedPageBlogPostShortcutResponse(List<BlogPost> listBlogPost, int page, int howManyRecord) {
+    private Page<BlogPostShortResDto> returnMappedPageBlogPostShortcutResponse(List<BlogPost> listBlogPost, int page, int howManyRecord) {
         var distinctListBlogPost = new ArrayList<>(new HashSet<>(listBlogPost));
 
         if (page < 0) {
@@ -280,10 +280,10 @@ public class BlogPostService {
         }
 
 
-        return blogPostList.map(new Function<BlogPost, BlogPostShortcutResponse>() {
+        return blogPostList.map(new Function<BlogPost, BlogPostShortResDto>() {
             @Override
-            public BlogPostShortcutResponse apply(BlogPost blogPost) {
-                BlogPostShortcutResponse bpSR = mapper.map(blogPost, BlogPostShortcutResponse.class);
+            public BlogPostShortResDto apply(BlogPost blogPost) {
+                BlogPostShortResDto bpSR = mapper.map(blogPost, BlogPostShortResDto.class);
                 bpSR.setRateAverage(blogPost.rateAverage());
                 return bpSR;
             }

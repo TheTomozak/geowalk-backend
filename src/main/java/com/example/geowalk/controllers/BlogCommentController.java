@@ -2,7 +2,7 @@ package com.example.geowalk.controllers;
 
 import com.example.geowalk.models.dto.requests.BlogCommentReqDto;
 import com.example.geowalk.models.dto.requests.BlogCommentVerificationReqDto;
-import com.example.geowalk.models.dto.responses.BlogCommentResponse;
+import com.example.geowalk.models.dto.responses.BlogCommentResDto;
 import com.example.geowalk.services.BlogCommentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class BlogCommentController {
     }
 
     @GetMapping("/{blogPostId}")
-    public List<BlogCommentResponse> getBlogComments(@PathVariable("blogPostId") long blogId) {
+    public List<BlogCommentResDto> getBlogComments(@PathVariable("blogPostId") long blogId) {
         logger.info("GET[api/comments/{}] Getting comments related to blogPost with id {}", blogId, blogId);
         return blogCommentService.getBlogComments(blogId);
     }
@@ -60,7 +60,7 @@ public class BlogCommentController {
 
     @GetMapping("/verify")
     @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
-    public List<BlogCommentResponse> getBlogCommentsToVerify() {
+    public List<BlogCommentResDto> getBlogCommentsToVerify() {
         logger.info("GET[api/comments/verify] Getting comments to verify");
         return blogCommentService.getBlogCommentsToVerify();
     }

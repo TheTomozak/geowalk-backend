@@ -9,6 +9,9 @@ import java.util.List;
 public class BlogPost extends EntityBase {
 
     @Column(nullable = false)
+    private String shortDescription;
+
+    @Column(nullable = false)
     private String content;
 
     @Column(nullable = false)
@@ -61,6 +64,14 @@ public class BlogPost extends EntityBase {
 
     public BlogPost() {
         super();
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
     }
 
     public String getContent() {

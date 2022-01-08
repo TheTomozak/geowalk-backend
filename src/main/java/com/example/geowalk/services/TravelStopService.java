@@ -2,11 +2,9 @@ package com.example.geowalk.services;
 
 import com.example.geowalk.exceptions.BadRequestException;
 import com.example.geowalk.exceptions.NotFoundException;
-import com.example.geowalk.models.dto.requests.TravelStopRequest;
+import com.example.geowalk.models.dto.requests.TravelStopReqDto;
 import com.example.geowalk.models.entities.TravelStop;
 import com.example.geowalk.models.repositories.TravelStopRepo;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -42,12 +40,12 @@ public class TravelStopService {
         }
     }
 
-    public List<TravelStop> getOrCreateTravelStopsByLocation(List<TravelStopRequest> travelStopRequestList){
+    public List<TravelStop> getOrCreateTravelStopsByLocation(List<TravelStopReqDto> travelStopReqDtoList){
 
         List<TravelStop> newTS = new ArrayList<>();
         List<TravelStop> tSList = new ArrayList<>();
 
-        travelStopRequestList.forEach(e -> {
+        travelStopReqDtoList.forEach(e -> {
             String country = e.getCountry();
             String city = e.getCity();
             String street = e.getStreet();
@@ -77,14 +75,14 @@ public class TravelStopService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_BLOG_POST));
     }
 
-    public TravelStop createTravelStop(TravelStopRequest travelStopRequest){
+    public TravelStop createTravelStop(TravelStopReqDto travelStopReqDto){
         return new TravelStop(
-                travelStopRequest.getName(),
-                travelStopRequest.getLatitude(),
-                travelStopRequest.getLongitude(),
-                travelStopRequest.getCountry(),
-                travelStopRequest.getCity(),
-                travelStopRequest.getStreet()
+                travelStopReqDto.getName(),
+                travelStopReqDto.getLatitude(),
+                travelStopReqDto.getLongitude(),
+                travelStopReqDto.getCountry(),
+                travelStopReqDto.getCity(),
+                travelStopReqDto.getStreet()
         );
     }
 

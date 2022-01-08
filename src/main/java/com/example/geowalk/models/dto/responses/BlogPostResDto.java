@@ -1,21 +1,15 @@
 package com.example.geowalk.models.dto.responses;
 
-import com.example.geowalk.models.entities.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-public class BlogPostResponse {
+public class BlogPostResDto {
 
     private Long id;
 
     private String title;
+
+    private String shortDescription;
 
     private String content;
 
@@ -25,11 +19,11 @@ public class BlogPostResponse {
 
     private UserResDto user;
 
-    private List<BlogCommentResponse> blogComments;
+    private List<BlogCommentResDto> blogComments;
 
-    private List<TravelStopResponse> travelStops;
+    private List<TravelStopResDto> travelStops;
 
-    private List<TravelRouteResponse> travelRoutes;
+    private List<TravelRouteResDto> travelRoutes;
 
     private Long numberOfVisits;
 
@@ -53,6 +47,14 @@ public class BlogPostResponse {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
     }
 
     public String getContent() {
@@ -87,27 +89,27 @@ public class BlogPostResponse {
         this.user = user;
     }
 
-    public List<BlogCommentResponse> getBlogComments() {
+    public List<BlogCommentResDto> getBlogComments() {
         return blogComments;
     }
 
-    public void setBlogComments(List<BlogCommentResponse> blogComments) {
+    public void setBlogComments(List<BlogCommentResDto> blogComments) {
         this.blogComments = blogComments;
     }
 
-    public List<TravelStopResponse> getTravelStops() {
+    public List<TravelStopResDto> getTravelStops() {
         return travelStops;
     }
 
-    public void setTravelStops(List<TravelStopResponse> travelStops) {
+    public void setTravelStops(List<TravelStopResDto> travelStops) {
         this.travelStops = travelStops;
     }
 
-    public List<TravelRouteResponse> getTravelRoutes() {
+    public List<TravelRouteResDto> getTravelRoutes() {
         return travelRoutes;
     }
 
-    public void setTravelRoutes(List<TravelRouteResponse> travelRoutes) {
+    public void setTravelRoutes(List<TravelRouteResDto> travelRoutes) {
         this.travelRoutes = travelRoutes;
     }
 

@@ -6,7 +6,7 @@ import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.exceptions.UnauthorizedException;
 import com.example.geowalk.models.dto.requests.BlogCommentReqDto;
 import com.example.geowalk.models.dto.requests.BlogCommentVerificationReqDto;
-import com.example.geowalk.models.dto.responses.BlogCommentResponse;
+import com.example.geowalk.models.dto.responses.BlogCommentResDto;
 import com.example.geowalk.models.dto.responses.UserResDto;
 import com.example.geowalk.models.entities.BlogComment;
 import com.example.geowalk.models.entities.BlogPost;
@@ -62,20 +62,20 @@ public class BlogCommentService {
         this.dict = dict;
     }
 
-    public List<BlogCommentResponse> getBlogComments(long blogPostId) {
+    public List<BlogCommentResDto> getBlogComments(long blogPostId) {
         Optional<BlogPost> blogPost = blogPostRepo.findById(blogPostId);
         if (blogPost.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_GET_COMMENT_FAILED), dict.getDict().get(BLOG_POST_NOT_FOUND));
             throw new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));
         }
 
-        List<BlogCommentResponse> result = new ArrayList<>();
+        List<BlogCommentResDto> result = new ArrayList<>();
         for (BlogComment blogComment : blogPost.get().getBlogComments()) {
             if (blogComment.isVisible() && !blogComment.isNeedToVerify()) {
                 UserResDto blogCommentUser = mapper.map(blogComment.getUser(), UserResDto.class);
-                BlogCommentResponse blogCommentResponse = mapper.map(blogComment, BlogCommentResponse.class);
-                blogCommentResponse.setUser(blogCommentUser);
-                result.add(blogCommentResponse);
+                BlogCommentResDto blogCommentResDto = mapper.map(blogComment, BlogCommentResDto.class);
+                blogCommentResDto.setUser(blogCommentUser);
+                result.add(blogCommentResDto);
             }
         }
         return result;
@@ -215,7 +215,7 @@ public class BlogCommentService {
          ***********************
     */
 
-    public List<BlogCommentResponse> getBlogCommentsToVerify() {
+    public List<BlogCommentResDto> getBlogCommentsToVerify() {
         Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
         if (loggedUserUsername.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_GET_COMMENT_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
@@ -234,10 +234,10 @@ public class BlogCommentService {
             }
         }
 
-        List<BlogCommentResponse> result = new ArrayList<>();
+        List<BlogCommentResDto> result = new ArrayList<>();
         for (BlogComment blogComment : blogCommentRepo.findBlogCommentsByNeedToVerifyTrue()) {
-            BlogCommentResponse blogCommentResponse = mapper.map(blogComment, BlogCommentResponse.class);
-            result.add(blogCommentResponse);
+            BlogCommentResDto blogCommentResDto = mapper.map(blogComment, BlogCommentResDto.class);
+            result.add(blogCommentResDto);
         }
 
         return result;

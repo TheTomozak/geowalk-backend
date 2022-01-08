@@ -2,7 +2,7 @@ package com.example.geowalk.models.dto.responses;
 
 import java.time.LocalDateTime;
 
-public class BlogCommentResponse {
+public class BlogCommentResDto {
 
     private long id;
 

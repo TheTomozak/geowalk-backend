@@ -1,20 +1,28 @@
-package com.example.geowalk.models.dto.responses;
+package com.example.geowalk.models.dto.requests;
 
-import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-public class TravelStopResponse {
 
+public class TravelStopReqDto {
+
+    @NotBlank
     private String name;
 
+    @NotNull
     private double latitude;
 
+    @NotNull
     private double longitude;
 
-    private String country;
+    @NotBlank
+    private String Country;
 
-    private String city;
+    @NotBlank
+    private String City;
 
-    private String street;
+    @NotBlank
+    private String Street;
 
     public String getName() {
         return name;
@@ -41,26 +49,26 @@ public class TravelStopResponse {
     }
 
     public String getCountry() {
-        return country;
+        return Country;
     }
 
     public void setCountry(String country) {
-        country = country;
+        Country = country;
     }
 
     public String getCity() {
-        return city;
+        return City;
     }
 
     public void setCity(String city) {
-        city = city;
+        City = city;
     }
 
     public String getStreet() {
-        return street;
+        return Street;
     }
 
     public void setStreet(String street) {
-        street = street;
+        Street = street;
     }
 }

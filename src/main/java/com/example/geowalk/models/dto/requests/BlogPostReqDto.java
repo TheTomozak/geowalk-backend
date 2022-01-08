@@ -3,7 +3,7 @@ package com.example.geowalk.models.dto.requests;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
-public class BlogPostRequest {
+public class BlogPostReqDto {
 
     @NotBlank
     private String title;
@@ -11,9 +11,9 @@ public class BlogPostRequest {
     @NotBlank
     private String content;
 
-    private List<TravelRouteRequest> travelRouteRequestList;
+    private List<TravelRouteReqDto> travelRouteReqDtoList;
 
-    private List<TravelStopRequest> travelStopRequestList;
+    private List<TravelStopReqDto> travelStopReqDtoList;
 
     private List<String> tagList;
 
@@ -42,19 +42,19 @@ public class BlogPostRequest {
         this.content = content;
     }
 
-    public List<TravelRouteRequest> getTravelRouteRequestList() {
-        return travelRouteRequestList;
+    public List<TravelRouteReqDto> getTravelRouteRequestList() {
+        return travelRouteReqDtoList;
     }
 
-    public void setTravelRouteRequestList(List<TravelRouteRequest> travelRouteRequestList) {
-        this.travelRouteRequestList = travelRouteRequestList;
+    public void setTravelRouteRequestList(List<TravelRouteReqDto> travelRouteReqDtoList) {
+        this.travelRouteReqDtoList = travelRouteReqDtoList;
     }
 
-    public List<TravelStopRequest> getTravelStopRequestList() {
-        return travelStopRequestList;
+    public List<TravelStopReqDto> getTravelStopRequestList() {
+        return travelStopReqDtoList;
     }
 
-    public void setTravelStopRequestList(List<TravelStopRequest> travelStopRequestList) {
-        this.travelStopRequestList = travelStopRequestList;
+    public void setTravelStopRequestList(List<TravelStopReqDto> travelStopReqDtoList) {
+        this.travelStopReqDtoList = travelStopReqDtoList;
     }
 }

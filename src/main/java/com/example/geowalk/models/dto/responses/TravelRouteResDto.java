@@ -1,26 +1,18 @@
-package com.example.geowalk.models.dto.requests;
+package com.example.geowalk.models.dto.responses;
 
 import com.example.geowalk.models.enums.RouteDifficulty;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.Set;
+import java.util.List;
 
-public class TravelRouteRequest {
-    @NotBlank
+public class TravelRouteResDto {
+
     private String name;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
     private RouteDifficulty difficulty;
 
-    @NotNull
-    private Set<TravelStopRequest> travelStopList;
-
-    @NotBlank
     private String description;
+
+    private List<TravelStopResDto> travelStops;
 
     public String getName() {
         return name;
@@ -46,11 +38,11 @@ public class TravelRouteRequest {
         this.description = description;
     }
 
-    public Set<TravelStopRequest> getTravelStopList() {
-        return travelStopList;
+    public List<TravelStopResDto> getTravelStops() {
+        return travelStops;
     }
 
-    public void setTravelStopList(Set<TravelStopRequest> travelStopList) {
-        this.travelStopList = travelStopList;
+    public void setTravelStops(List<TravelStopResDto> travelStops) {
+        this.travelStops = travelStops;
     }
 }
