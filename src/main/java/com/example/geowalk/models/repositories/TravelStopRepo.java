@@ -12,13 +12,12 @@ import java.util.Optional;
 
 @Repository
 public interface TravelStopRepo extends JpaRepository<TravelStop, Long> {
-    Optional<TravelStop> findByName(String name);
-
     @Query(value = "select * from travel_stop where country = :country and city = :city and street LIKE :street%", nativeQuery = true)
     List<TravelStop> findAllByVisibleIsTrueAndCountryAndCityAndStreet(String country, String city, String street);
+
     List<TravelStop> findAllByVisibleIsTrueAndCountryAndCity(String country, String city);
+
     List<TravelStop> findAllByVisibleIsTrueAndCountry(String country);
 
-//    @Query(value = "select * from travel_stop where country = :country and city = :city and street LIKE :street", nativeQuery = true)
-    TravelStop findByVisibleIsTrueAndCountryAndCityAndStreet(String country, String city, String street);
+    Optional<TravelStop> findByVisibleIsTrueAndCountryAndCityAndStreet(String country, String city, String street);
 }

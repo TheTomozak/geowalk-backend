@@ -16,7 +16,7 @@ public class TravelRoute extends EntityBase {
     @Enumerated(EnumType.STRING)
     private RouteDifficulty difficulty;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 300)
     private String description;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

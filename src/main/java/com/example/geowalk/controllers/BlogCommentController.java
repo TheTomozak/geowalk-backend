@@ -53,10 +53,10 @@ public class BlogCommentController {
     }
 
     /*
-        ***********************
-        * Moderator endpoints *
-        ***********************
-    */
+     ***********************
+     * Moderator endpoints *
+     ***********************
+     */
 
     @GetMapping("/verify")
     @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")

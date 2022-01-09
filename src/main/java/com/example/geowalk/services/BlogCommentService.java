@@ -94,7 +94,7 @@ public class BlogCommentService {
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
         }
 
-        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrue(blogPostId);
+        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
         if (blogPost.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_COMMENT_FAILED), dict.getDict().get(BLOG_POST_NOT_FOUND));
             throw new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));

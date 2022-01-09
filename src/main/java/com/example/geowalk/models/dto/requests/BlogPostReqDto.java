@@ -6,17 +6,28 @@ import java.util.List;
 public class BlogPostReqDto {
 
     @NotBlank
-    private String title;
+    private String shortDescription;
 
     @NotBlank
     private String content;
 
-    private List<TravelRouteReqDto> travelRouteReqDtoList;
+    @NotBlank
+    private String title;
 
-    private List<TravelStopReqDto> travelStopReqDtoList;
+    private List<TravelRouteReqDto> travelRoutes;
+
+    private List<TravelStopReqDto> travelStops;
 
     private List<String> tagList;
 
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
 
     public List<String> getTagList() {
         return tagList;
@@ -42,19 +53,19 @@ public class BlogPostReqDto {
         this.content = content;
     }
 
-    public List<TravelRouteReqDto> getTravelRouteRequestList() {
-        return travelRouteReqDtoList;
+    public List<TravelRouteReqDto> getTravelRoutes() {
+        return travelRoutes;
     }
 
-    public void setTravelRouteRequestList(List<TravelRouteReqDto> travelRouteReqDtoList) {
-        this.travelRouteReqDtoList = travelRouteReqDtoList;
+    public void setTravelRoutes(List<TravelRouteReqDto> travelRoutes) {
+        this.travelRoutes = travelRoutes;
     }
 
-    public List<TravelStopReqDto> getTravelStopRequestList() {
-        return travelStopReqDtoList;
+    public List<TravelStopReqDto> getTravelStops() {
+        return travelStops;
     }
 
-    public void setTravelStopRequestList(List<TravelStopReqDto> travelStopReqDtoList) {
-        this.travelStopReqDtoList = travelStopReqDtoList;
+    public void setTravelStops(List<TravelStopReqDto> travelStops) {
+        this.travelStops = travelStops;
     }
 }

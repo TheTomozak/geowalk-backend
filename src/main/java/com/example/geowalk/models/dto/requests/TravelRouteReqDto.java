@@ -16,11 +16,11 @@ public class TravelRouteReqDto {
     @Enumerated(EnumType.STRING)
     private RouteDifficulty difficulty;
 
-    @NotNull
-    private Set<TravelStopReqDto> travelStopList;
-
     @NotBlank
     private String description;
+
+    @NotNull
+    private Set<TravelStopReqDto> travelStops;
 
     public String getName() {
         return name;
@@ -46,11 +46,11 @@ public class TravelRouteReqDto {
         this.description = description;
     }
 
-    public Set<TravelStopReqDto> getTravelStopList() {
-        return travelStopList;
+    public Set<TravelStopReqDto> getTravelStops() {
+        return travelStops;
     }
 
-    public void setTravelStopList(Set<TravelStopReqDto> travelStopList) {
-        this.travelStopList = travelStopList;
+    public void setTravelStops(Set<TravelStopReqDto> travelStops) {
+        this.travelStops = travelStops;
     }
 }

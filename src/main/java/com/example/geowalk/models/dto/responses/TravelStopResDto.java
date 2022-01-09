@@ -1,7 +1,5 @@
 package com.example.geowalk.models.dto.responses;
 
-import javax.persistence.Column;
-
 public class TravelStopResDto {
 
     private String name;

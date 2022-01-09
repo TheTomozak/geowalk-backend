@@ -8,7 +8,7 @@ import java.util.List;
 @Entity
 public class BlogPost extends EntityBase {
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String shortDescription;
 
     @Column(nullable = false)
@@ -56,9 +56,10 @@ public class BlogPost extends EntityBase {
 
     private Long numberOfVisits;
 
-    public BlogPost(String content, String title) {
+    public BlogPost(String content, String title, String shortDescription) {
         this.content = content;
         this.title = title;
+        this.shortDescription = shortDescription;
         numberOfVisits = 0L;
     }
 
@@ -170,9 +171,11 @@ public class BlogPost extends EntityBase {
         this.needToVerify = needToVerify;
     }
 
-    public Double rateAverage(){
+    public Double getAverageRate() {
         double sum = blogComments.stream().map(BlogComment::getRating).mapToInt(Integer::intValue).sum();
         double values = (double) blogComments.stream().map(BlogComment::getRating).count();
-        return sum/values;
+        return sum / values;
     }
+
+
 }

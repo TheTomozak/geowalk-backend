@@ -16,7 +16,7 @@ values ('PJATK', '52.223941713710204', '20.99456713842226', true, 'Poland', 'War
        ('Stacja Grawitacja', '52.21286546599547', '20.96246636355756', true, 'Poland', 'Warszawa',
         'Aleja Bohaterów Września 12'),                                                                              --3
 
-       ('Muzeum Pałacu Króla Jana III w Wilanowie', '52.165338097257546', '21.09058362913881', true, 'Polska',
+       ('Muzeum Pałacu Króla Jana III w Wilanowie', '52.165338097257546', '21.09058362913881', true, 'Poland',
         'Warszawa', 'Stanisława Kostki Potockiego 10/16'),                                                           --4
 
        ('Bazylika Świętego Piotra', '41.90228751188043', '12.454159580944626', true, 'Vatican', 'Roma',
