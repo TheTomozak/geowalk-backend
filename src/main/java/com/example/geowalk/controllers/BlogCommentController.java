@@ -3,6 +3,7 @@ package com.example.geowalk.controllers;
 import com.example.geowalk.models.dto.requests.BlogCommentReqDto;
 import com.example.geowalk.models.dto.requests.BlogCommentVerificationReqDto;
 import com.example.geowalk.models.dto.responses.BlogCommentResDto;
+import com.example.geowalk.models.dto.responses.BlogPostResDto;
 import com.example.geowalk.services.BlogCommentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,13 @@ public class BlogCommentController {
     public List<BlogCommentResDto> getBlogComments(@PathVariable("blogPostId") long blogId) {
         logger.info("GET[api/comments/{}] Getting comments related to blogPost with id {}", blogId, blogId);
         return blogCommentService.getBlogComments(blogId);
+    }
+
+    @GetMapping("/latest")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public BlogCommentResDto getLatestBlogComment() {
+        logger.info("GET[api/comments/latest] Getting latest comment");
+        return blogCommentService.getLatestBlogComment();
     }
 
     @PostMapping("/{blogPostId}")

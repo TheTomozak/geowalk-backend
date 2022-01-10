@@ -7,6 +7,7 @@ import com.example.geowalk.exceptions.UnauthorizedException;
 import com.example.geowalk.models.dto.requests.BlogCommentReqDto;
 import com.example.geowalk.models.dto.requests.BlogCommentVerificationReqDto;
 import com.example.geowalk.models.dto.responses.BlogCommentResDto;
+import com.example.geowalk.models.dto.responses.BlogPostResDto;
 import com.example.geowalk.models.dto.responses.UserResDto;
 import com.example.geowalk.models.entities.BlogComment;
 import com.example.geowalk.models.entities.BlogPost;
@@ -79,6 +80,11 @@ public class BlogCommentService {
             }
         }
         return result;
+    }
+
+    public BlogCommentResDto getLatestBlogComment() {
+        BlogComment latestBlogComment = blogCommentRepo.findFirstByVisibleTrueOrderByCreationDateTimeDesc();
+        return mapper.map(latestBlogComment, BlogCommentResDto.class);
     }
 
     public void createBlogComment(long blogPostId, BlogCommentReqDto request) {
