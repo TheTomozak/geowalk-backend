@@ -68,6 +68,13 @@ public class BlogPostController {
         return blogPostService.getBlogPostsBySearchParam(page, size, searchValue);
     }
 
+    @GetMapping("/latest")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public BlogPostShortResDto getLatestBlogPost() {
+        logger.info("GET[api/blogs/latest] Getting latest blog post");
+        return blogPostService.getLatestBlogPost();
+    }
+
     @GetMapping("/{blogPostId}")
     public BlogPostResDto getBlogPost(@PathVariable("blogPostId") Long blogPostId) {
         logger.info("GET[api/blogs/{}] Getting blog post with id {}", blogPostId, blogPostId);

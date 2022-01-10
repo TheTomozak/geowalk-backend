@@ -126,6 +126,11 @@ public class BlogPostService {
         return convertToBlogPostShortResDto(blogPostPage);
     }
 
+    public BlogPostShortResDto getLatestBlogPost() {
+        BlogPost latestBlogPost = blogPostRepo.findFirstByVisibleTrueOrderByCreationDateTimeDesc();
+        return mapper.map(latestBlogPost, BlogPostShortResDto.class);
+    }
+
     public BlogPostResDto getBlogPost(Long blogPostId) {
         Optional<BlogPost> blogPost = blogPostRepo.findById(blogPostId);
         if (blogPost.isEmpty()) {
