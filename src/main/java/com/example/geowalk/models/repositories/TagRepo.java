@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface TagRepo extends JpaRepository<Tag, Long> {
 
     Optional<Tag> findByNameIgnoreCase(String name);
+    Integer countTagsByVisibleTrue();
 }

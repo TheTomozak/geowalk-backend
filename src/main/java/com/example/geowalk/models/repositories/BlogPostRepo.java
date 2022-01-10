@@ -21,6 +21,7 @@ public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
     List<BlogPost> findBlogPostsByVisibleTrueAndNeedToVerifyFalse();
     Optional<BlogPost> findByIdAndVisibleTrueAndNeedToVerifyFalse(long id);
     BlogPost findFirstByVisibleTrueOrderByCreationDateTimeDesc();
+    Integer countBlogPostsByVisibleTrue();
 
     String query = "SELECT DISTINCT bp.ID, bp.VISIBLE, bp.CONTENT, bp.CREATION_DATE_TIME, " +
             "bp.LAST_EDIT_DATE_TIME, bp.NEED_TO_VERIFY, bp.NUMBER_OF_VISITS, bp.SHORT_DESCRIPTION, " +

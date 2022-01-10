@@ -3,7 +3,6 @@ package com.example.geowalk.controllers;
 import com.example.geowalk.models.dto.requests.BlogCommentReqDto;
 import com.example.geowalk.models.dto.requests.BlogCommentVerificationReqDto;
 import com.example.geowalk.models.dto.responses.BlogCommentResDto;
-import com.example.geowalk.models.dto.responses.BlogPostResDto;
 import com.example.geowalk.services.BlogCommentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
