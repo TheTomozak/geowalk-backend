@@ -1,12 +1,16 @@
 package com.example.geowalk.services;
 
 import com.example.geowalk.exceptions.BadRequestException;
+import com.example.geowalk.exceptions.ForbiddenException;
 import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.exceptions.UnauthorizedException;
 import com.example.geowalk.models.dto.requests.BlogPostReqDto;
+import com.example.geowalk.models.dto.requests.BlogPostVerificationReqDto;
+import com.example.geowalk.models.dto.responses.BlogCommentResDto;
 import com.example.geowalk.models.dto.responses.BlogPostResDto;
 import com.example.geowalk.models.dto.responses.BlogPostShortResDto;
 import com.example.geowalk.models.entities.*;
+import com.example.geowalk.models.enums.Role;
 import com.example.geowalk.models.repositories.BlogPostRepo;
 import com.example.geowalk.models.repositories.TagRepo;
 import com.example.geowalk.models.repositories.UserRepo;
@@ -209,6 +213,76 @@ public class BlogPostService {
         logger.info(blogPost.isNeedToVerify() ? dict.getDict().get(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST) : "Creating post success");
     }
 
+    public List<BlogPostShortResDto> getBlogPostsToVerify() {
+        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
+        if (loggedUserUsername.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_GET_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
+            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
+        }
+
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        if (loggedUser.isEmpty()) {
+            throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
+        }
+
+        if(!loggedUser.get().getRole().equals(Role.MODERATOR)) {
+            if(!loggedUser.get().getRole().equals(Role.ADMIN)) {
+                logger.error("{}{}", dict.getDict().get(LOGGER_GET_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
+                throw new ForbiddenException(dict.getDict().get(USER_NOT_AUTHORIZED));
+            }
+        }
+
+        List<BlogPostShortResDto> result = new ArrayList<>();
+        for (BlogPost blogPost : blogPostRepo.findBlogPostsByNeedToVerifyTrue()) {
+            BlogPostShortResDto blogPostShortResDto = mapper.map(blogPost, BlogPostShortResDto.class);
+            result.add(blogPostShortResDto);
+        }
+
+        return result;
+    }
+
+    public void verifyBlogPost(BlogPostVerificationReqDto request) {
+        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
+        if (loggedUserUsername.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
+            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
+        }
+
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        if (loggedUser.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_POST_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
+            throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
+        }
+
+        if(!loggedUser.get().getRole().equals(Role.MODERATOR)) {
+            if(!loggedUser.get().getRole().equals(Role.ADMIN)) {
+                logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
+                throw new ForbiddenException(dict.getDict().get(USER_NOT_AUTHORIZED));
+            }
+        }
+
+        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyTrue(request.getBlogPostId());
+
+        if(blogPost.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_POST_FAILED), dict.getDict().get(BLOG_POST_NOT_FOUND));
+            throw new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));
+        }
+
+        if(!request.getResult().equals("REJECTED")) {
+            if(!request.getResult().equals("ACCEPTED")) {
+                logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_POST_FAILED), dict.getDict().get(INVALID_RESULT_VALUE));
+                throw new BadRequestException(dict.getDict().get(INVALID_RESULT_VALUE));
+            }
+        }
+
+        if(request.getResult().equals("REJECTED")) {
+            blogPost.get().setVisible(false);
+        }
+
+        blogPost.get().setNeedToVerify(false);
+        logger.info("Verification post success");
+    }
+
     private BlogPostResDto convertBlogPostToBlogPostResDto(BlogPost blogPost) {
         BlogPostResDto blogPostResDto = mapper.map(blogPost, BlogPostResDto.class);
         blogPostResDto.setRateAverage(blogPost.getAverageRate());
@@ -235,4 +309,5 @@ public class BlogPostService {
         }
         return new PageImpl<>(output, pageRequest, total);
     }
+
 }

@@ -22,6 +22,8 @@ public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
     Optional<BlogPost> findByIdAndVisibleTrueAndNeedToVerifyFalse(long id);
     BlogPost findFirstByVisibleTrueOrderByCreationDateTimeDesc();
     Integer countBlogPostsByVisibleTrue();
+    List<BlogPost> findBlogPostsByNeedToVerifyTrue();
+    Optional<BlogPost> findByIdAndVisibleTrueAndNeedToVerifyTrue(Long blogPostId);
 
     String query = "SELECT DISTINCT bp.ID, bp.VISIBLE, bp.CONTENT, bp.CREATION_DATE_TIME, " +
             "bp.LAST_EDIT_DATE_TIME, bp.NEED_TO_VERIFY, bp.NUMBER_OF_VISITS, bp.SHORT_DESCRIPTION, " +
@@ -33,4 +35,5 @@ public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
             "UPPER(t.NAME) LIKE UPPER(CONCAT('%', :searchWord, '%'))";
     @Query(value = query, nativeQuery = true)
     Page<BlogPost> findAllBlogPostsBySearchWord(@Param("searchWord") String searchWord, Pageable pageable);
+
 }

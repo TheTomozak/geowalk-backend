@@ -22,6 +22,7 @@ public class MessagesUtil {
             put(LOGGER_GET_POST_FAILED, "Getting posts failed: ");
             put(LOGGER_CREATE_POST_FAILED, "Creating post failed: ");
             put(LOGGER_UPDATE_POST_FAILED, "Updating post failed: ");
+            put(LOGGER_VERIFY_POST_FAILED, "Verifying post failed: ");
 
             put(LOGGER_GET_COMMENT_FAILED, "Getting comments failed: ");
             put(LOGGER_CREATE_COMMENT_FAILED, "Creating comment failed: ");
