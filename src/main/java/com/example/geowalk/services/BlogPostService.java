@@ -97,7 +97,12 @@ public class BlogPostService {
 
         List<TravelStop> travelStopList = travelStopService.getAllTravelStopByLocation(country, city, street);
         Set<BlogPost> blogPostSet = new LinkedHashSet<>();
-        travelStopList.forEach(travelStop -> blogPostSet.addAll(travelStop.getBlogPosts()));
+        travelStopList.forEach(travelStop -> {
+            Set<BlogPost> blogPosts = travelStop.getBlogPosts().stream()
+                                                                .filter(blogPost -> !blogPost.isNeedToVerify() && blogPost.isVisible())
+                                                                .collect(Collectors.toSet());
+            blogPostSet.addAll(blogPosts);
+        });
 
         Page<BlogPost> blogPostPage = convertListToPage(new ArrayList<>(blogPostSet), page, size);
 
@@ -113,7 +118,12 @@ public class BlogPostService {
 
         Set<BlogPost> blogPostSet = new LinkedHashSet<>();
         for (TravelStop travelStop : travelStopList) {
-            travelStop.getTravelRoutes().forEach(travelRoute -> blogPostSet.addAll(travelRoute.getBlogPosts()));
+            travelStop.getTravelRoutes().forEach(travelRoute -> {
+                Set<BlogPost> blogPosts = travelRoute.getBlogPosts().stream()
+                                                                    .filter(blogPost -> !blogPost.isNeedToVerify() && blogPost.isVisible())
+                                                                    .collect(Collectors.toSet());
+                blogPostSet.addAll(blogPosts);
+            });
         }
 
         Page<BlogPost> blogPostPage = convertListToPage(new ArrayList<>(blogPostSet), page, size);
@@ -136,7 +146,7 @@ public class BlogPostService {
     }
 
     public BlogPostResDto getBlogPost(Long blogPostId) {
-        Optional<BlogPost> blogPost = blogPostRepo.findById(blogPostId);
+        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
         if (blogPost.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_GET_POST_FAILED), dict.getDict().get(BLOG_POST_NOT_FOUND));
             throw new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));
@@ -147,13 +157,7 @@ public class BlogPostService {
     }
 
     public void createBlogPost(BlogPostReqDto request) {
-        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if (loggedUserUsername.isEmpty()) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
-        }
-
-        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_COMMENT_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
@@ -214,26 +218,13 @@ public class BlogPostService {
     }
 
     public List<BlogPostShortResDto> getBlogPostsToVerify() {
-        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if (loggedUserUsername.isEmpty()) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_GET_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
-        }
-
-        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
         }
 
-        if(!loggedUser.get().getRole().equals(Role.MODERATOR)) {
-            if(!loggedUser.get().getRole().equals(Role.ADMIN)) {
-                logger.error("{}{}", dict.getDict().get(LOGGER_GET_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-                throw new ForbiddenException(dict.getDict().get(USER_NOT_AUTHORIZED));
-            }
-        }
-
         List<BlogPostShortResDto> result = new ArrayList<>();
-        for (BlogPost blogPost : blogPostRepo.findBlogPostsByNeedToVerifyTrue()) {
+        for (BlogPost blogPost : blogPostRepo.findBlogPostsByVisibleTrueAndNeedToVerifyTrue()) {
             BlogPostShortResDto blogPostShortResDto = mapper.map(blogPost, BlogPostShortResDto.class);
             result.add(blogPostShortResDto);
         }
@@ -242,23 +233,10 @@ public class BlogPostService {
     }
 
     public void verifyBlogPost(BlogPostVerificationReqDto request) {
-        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if (loggedUserUsername.isEmpty()) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
-        }
-
-        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_POST_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
-        }
-
-        if(!loggedUser.get().getRole().equals(Role.MODERATOR)) {
-            if(!loggedUser.get().getRole().equals(Role.ADMIN)) {
-                logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-                throw new ForbiddenException(dict.getDict().get(USER_NOT_AUTHORIZED));
-            }
         }
 
         Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyTrue(request.getBlogPostId());

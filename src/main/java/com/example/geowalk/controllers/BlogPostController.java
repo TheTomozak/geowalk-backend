@@ -31,7 +31,7 @@ public class BlogPostController {
     @GetMapping
     public Page<BlogPostShortResDto> getBlogPosts(@RequestParam(defaultValue = "0") int page,
                                                   @RequestParam(defaultValue = "3") int size) {
-        logger.info("GET[api/blogs] Getting {} blog posts on page {} and sorted by column {}", size, page);
+        logger.info("GET[api/blogs] Getting {} blog posts on page {}", size, page);
         return blogPostService.getBlogPosts(page, size);
     }
 

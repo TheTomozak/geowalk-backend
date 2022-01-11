@@ -3,11 +3,9 @@ package com.example.geowalk.services;
 import com.example.geowalk.exceptions.BadRequestException;
 import com.example.geowalk.exceptions.ForbiddenException;
 import com.example.geowalk.exceptions.NotFoundException;
-import com.example.geowalk.exceptions.UnauthorizedException;
 import com.example.geowalk.models.dto.requests.BlogCommentReqDto;
 import com.example.geowalk.models.dto.requests.BlogCommentVerificationReqDto;
 import com.example.geowalk.models.dto.responses.BlogCommentResDto;
-import com.example.geowalk.models.dto.responses.BlogPostResDto;
 import com.example.geowalk.models.dto.responses.UserResDto;
 import com.example.geowalk.models.entities.BlogComment;
 import com.example.geowalk.models.entities.BlogPost;
@@ -29,6 +27,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import static com.example.geowalk.utils.messages.MessageKeys.*;
 
 @Service
@@ -64,7 +63,7 @@ public class BlogCommentService {
     }
 
     public List<BlogCommentResDto> getBlogComments(long blogPostId) {
-        Optional<BlogPost> blogPost = blogPostRepo.findById(blogPostId);
+        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
         if (blogPost.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_GET_COMMENT_FAILED), dict.getDict().get(BLOG_POST_NOT_FOUND));
             throw new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));
@@ -88,13 +87,7 @@ public class BlogCommentService {
     }
 
     public void createBlogComment(long blogPostId, BlogCommentReqDto request) {
-        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if (loggedUserUsername.isEmpty()) {
-            logger.error("{}{}",dict.getDict().get(LOGGER_CREATE_COMMENT_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
-        }
-
-        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_COMMENT_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
@@ -139,13 +132,7 @@ public class BlogCommentService {
     }
 
     public void updateBlogComment(long blogCommentId, BlogCommentReqDto request) {
-        Optional<String> loggedUserUserName = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if (loggedUserUserName.isEmpty()) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_COMMENT_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
-        }
-
-        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUserName.get());
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_COMMENT_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
@@ -186,19 +173,13 @@ public class BlogCommentService {
     }
 
     public void deleteBlogComment(long blogCommentId) {
-        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if (loggedUserUsername.isEmpty()) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_DELETE_COMMENT_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
-        }
-
-        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_DELETE_COMMENT_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
         }
 
-        Optional<BlogComment> blogComment = blogCommentRepo.findById(blogCommentId);
+        Optional<BlogComment> blogComment = blogCommentRepo.findByIdAndVisibleTrue(blogCommentId);
         if (blogComment.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_DELETE_COMMENT_FAILED), dict.getDict().get(BLOG_COMMENT_NOT_FOUND));
             throw new NotFoundException(dict.getDict().get(BLOG_COMMENT_NOT_FOUND));
@@ -222,26 +203,13 @@ public class BlogCommentService {
     */
 
     public List<BlogCommentResDto> getBlogCommentsToVerify() {
-        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if (loggedUserUsername.isEmpty()) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_GET_COMMENT_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
-        }
-
-        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
         }
 
-        if(!loggedUser.get().getRole().equals(Role.MODERATOR)) {
-            if(!loggedUser.get().getRole().equals(Role.ADMIN)) {
-                logger.error("{}{}", dict.getDict().get(LOGGER_GET_COMMENT_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-                throw new ForbiddenException(dict.getDict().get(USER_NOT_AUTHORIZED));
-            }
-        }
-
         List<BlogCommentResDto> result = new ArrayList<>();
-        for (BlogComment blogComment : blogCommentRepo.findBlogCommentsByNeedToVerifyTrue()) {
+        for (BlogComment blogComment : blogCommentRepo.findBlogCommentsByVisibleTrueAndAndNeedToVerifyTrue()) {
             BlogCommentResDto blogCommentResDto = mapper.map(blogComment, BlogCommentResDto.class);
             result.add(blogCommentResDto);
         }
@@ -250,23 +218,10 @@ public class BlogCommentService {
     }
 
     public void verifyBlogComment(BlogCommentVerificationReqDto request) {
-        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if (loggedUserUsername.isEmpty()) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_COMMENT_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
-        }
-
-        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_COMMENT_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
-        }
-
-        if(!loggedUser.get().getRole().equals(Role.MODERATOR)) {
-            if(!loggedUser.get().getRole().equals(Role.ADMIN)) {
-                logger.error("{}{}", dict.getDict().get(LOGGER_VERIFY_COMMENT_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-                throw new ForbiddenException(dict.getDict().get(USER_NOT_AUTHORIZED));
-            }
         }
 
         Optional<BlogComment> blogComment = blogCommentRepo.findByIdAndVisibleTrueAndNeedToVerifyTrue(request.getBlogCommentId());

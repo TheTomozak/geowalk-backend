@@ -22,7 +22,7 @@ public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
     Optional<BlogPost> findByIdAndVisibleTrueAndNeedToVerifyFalse(long id);
     BlogPost findFirstByVisibleTrueOrderByCreationDateTimeDesc();
     Integer countBlogPostsByVisibleTrue();
-    List<BlogPost> findBlogPostsByNeedToVerifyTrue();
+    List<BlogPost> findBlogPostsByVisibleTrueAndNeedToVerifyTrue();
     Optional<BlogPost> findByIdAndVisibleTrueAndNeedToVerifyTrue(Long blogPostId);
 
     String query = "SELECT DISTINCT bp.ID, bp.VISIBLE, bp.CONTENT, bp.CREATION_DATE_TIME, " +
@@ -30,9 +30,10 @@ public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
             "bp.TITLE, bp.USER_ID  FROM BLOG_POST  bp " +
             "JOIN BLOG_POSTS_TAGS bpt ON bpt.BLOG_POST_ID = bp.id " +
             "JOIN TAG t ON t.ID = bpt.TAG_ID " +
-            "WHERE UPPER(bp.CONTENT) LIKE UPPER(CONCAT('%', :searchWord, '%')) OR " +
+            "WHERE (bp.VISIBLE AND NOT bp.NEED_TO_VERIFY) AND" +
+            "(UPPER(bp.CONTENT) LIKE UPPER(CONCAT('%', :searchWord, '%')) OR " +
             "UPPER(bp.TITLE) LIKE UPPER(CONCAT('%', :searchWord, '%')) OR " +
-            "UPPER(t.NAME) LIKE UPPER(CONCAT('%', :searchWord, '%'))";
+            "UPPER(t.NAME) LIKE UPPER(CONCAT('%', :searchWord, '%')))";
     @Query(value = query, nativeQuery = true)
     Page<BlogPost> findAllBlogPostsBySearchWord(@Param("searchWord") String searchWord, Pageable pageable);
 

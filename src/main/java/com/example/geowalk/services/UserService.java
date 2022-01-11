@@ -1,6 +1,9 @@
 package com.example.geowalk.services;
 
-import com.example.geowalk.exceptions.*;
+import com.example.geowalk.exceptions.BadRequestException;
+import com.example.geowalk.exceptions.ForbiddenException;
+import com.example.geowalk.exceptions.NotAcceptableException;
+import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.models.dto.requests.UserReqDto;
 import com.example.geowalk.models.entities.User;
 import com.example.geowalk.models.enums.Role;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+
 import static com.example.geowalk.utils.messages.MessageKeys.*;
 
 @Service
@@ -112,13 +116,7 @@ public class UserService {
     }
 
     public void updateUser(long userId, UserReqDto request) {
-        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if (loggedUserUsername.isEmpty()) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_USER_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
-        }
-
-        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_USER_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
@@ -172,19 +170,13 @@ public class UserService {
     }
 
     public void deleteUser(long userId) {
-        Optional<String> loggedUserUsername = Optional.ofNullable(sessionUtil.getLoggedUserUsername());
-        if (loggedUserUsername.isEmpty()) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_DELETE_USER_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
-            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
-        }
-
-        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(loggedUserUsername.get());
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_DELETE_USER_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
         }
 
-        if (!loggedUser.get().getRole().equals(Role.ADMIN)) {
+        if (loggedUser.get().getRole().equals(Role.USER) && loggedUser.get().getId() != userId) {
             logger.error("{}{}", dict.getDict().get(LOGGER_DELETE_USER_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
             throw new ForbiddenException(dict.getDict().get(USER_NOT_AUTHORIZED));
         }
