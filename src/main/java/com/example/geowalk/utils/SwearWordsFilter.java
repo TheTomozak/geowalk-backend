@@ -33,10 +33,9 @@ public class SwearWordsFilter {
     }
 
     public boolean hasSwearWord(String content) {
-        String[] words = content.split(" ");
-        for (String word: words) {
-            if(allSwearWords.containsKey(word.toLowerCase())) {
-                logger.info("Swear word found - {}", word);
+        for (String swearWord : allSwearWords.keySet()) {
+            if(content.toLowerCase().contains(swearWord)) {
+                logger.info("Swear word found - {}", swearWord);
                 return true;
             }
         }
