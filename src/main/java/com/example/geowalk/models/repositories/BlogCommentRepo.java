@@ -12,7 +12,7 @@ public interface BlogCommentRepo extends JpaRepository<BlogComment, Long> {
 
     Optional<BlogComment> findByIdAndVisibleTrue(long id);
 
-    List<BlogComment> findBlogCommentsByVisibleTrueAndAndNeedToVerifyTrue();
+    List<BlogComment> findBlogCommentsByVisibleTrueAndAndNeedToVerifyTrueOrderByCreationDateTime();
 
     Optional<BlogComment> findByIdAndVisibleTrueAndNeedToVerifyTrue(long id);
 

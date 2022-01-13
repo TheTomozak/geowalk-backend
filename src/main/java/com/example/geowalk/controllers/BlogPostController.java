@@ -98,9 +98,10 @@ public class BlogPostController {
      */
     @GetMapping("/verify")
     @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
-    public List<BlogPostShortResDto> getBlogPostsToVerify() {
+    public Page<BlogPostShortResDto> getBlogPostsToVerify(@RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "3") int size) {
         logger.info("GET[api/blogs/verify] Getting posts to verify");
-        return blogPostService.getBlogPostsToVerify();
+        return blogPostService.getBlogPostsToVerify(page, size);
     }
 
     @PostMapping("/verify")

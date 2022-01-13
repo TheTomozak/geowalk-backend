@@ -7,6 +7,7 @@ import com.example.geowalk.services.BlogCommentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,9 +68,10 @@ public class BlogCommentController {
 
     @GetMapping("/verify")
     @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
-    public List<BlogCommentResDto> getBlogCommentsToVerify() {
+    public Page<BlogCommentResDto> getBlogCommentsToVerify(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "3") int size) {
         logger.info("GET[api/comments/verify] Getting comments to verify");
-        return blogCommentService.getBlogCommentsToVerify();
+        return blogCommentService.getBlogCommentsToVerify(page, size);
     }
 
     @PostMapping("/verify")

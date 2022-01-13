@@ -217,19 +217,15 @@ public class BlogPostService {
         logger.info(blogPost.isNeedToVerify() ? dict.getDict().get(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST) : "Creating post success");
     }
 
-    public List<BlogPostShortResDto> getBlogPostsToVerify() {
+    public Page<BlogPostShortResDto> getBlogPostsToVerify(int page, int size) {
         Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
         }
 
-        List<BlogPostShortResDto> result = new ArrayList<>();
-        for (BlogPost blogPost : blogPostRepo.findBlogPostsByVisibleTrueAndNeedToVerifyTrue()) {
-            BlogPostShortResDto blogPostShortResDto = mapper.map(blogPost, BlogPostShortResDto.class);
-            result.add(blogPostShortResDto);
-        }
-
-        return result;
+        List<BlogPost> blogPosts = new ArrayList<>(blogPostRepo.findBlogPostsByVisibleTrueAndNeedToVerifyTrueOrderByCreationDateTime());
+        Page<BlogPost> blogPostPage = convertListToPage(blogPosts, page, size);
+        return convertToBlogPostShortResDto(blogPostPage);
     }
 
     public void verifyBlogPost(BlogPostVerificationReqDto request) {

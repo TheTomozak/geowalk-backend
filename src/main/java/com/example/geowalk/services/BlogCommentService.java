@@ -6,6 +6,8 @@ import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.models.dto.requests.BlogCommentReqDto;
 import com.example.geowalk.models.dto.requests.BlogCommentVerificationReqDto;
 import com.example.geowalk.models.dto.responses.BlogCommentResDto;
+import com.example.geowalk.models.dto.responses.BlogPostResDto;
+import com.example.geowalk.models.dto.responses.BlogPostShortResDto;
 import com.example.geowalk.models.dto.responses.UserResDto;
 import com.example.geowalk.models.entities.BlogComment;
 import com.example.geowalk.models.entities.BlogPost;
@@ -21,6 +23,9 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -202,19 +207,15 @@ public class BlogCommentService {
          ***********************
     */
 
-    public List<BlogCommentResDto> getBlogCommentsToVerify() {
+    public Page<BlogCommentResDto> getBlogCommentsToVerify(int page, int size) {
         Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
         }
 
-        List<BlogCommentResDto> result = new ArrayList<>();
-        for (BlogComment blogComment : blogCommentRepo.findBlogCommentsByVisibleTrueAndAndNeedToVerifyTrue()) {
-            BlogCommentResDto blogCommentResDto = mapper.map(blogComment, BlogCommentResDto.class);
-            result.add(blogCommentResDto);
-        }
-
-        return result;
+        List<BlogComment> blogComments = new ArrayList<>(blogCommentRepo.findBlogCommentsByVisibleTrueAndAndNeedToVerifyTrueOrderByCreationDateTime());
+        Page<BlogComment> blogCommentsPage = convertListToPage(blogComments, page, size);
+        return blogCommentsPage.map(blogComment -> mapper.map(blogComment, BlogCommentResDto.class));
     }
 
     public void verifyBlogComment(BlogCommentVerificationReqDto request) {
@@ -244,5 +245,18 @@ public class BlogCommentService {
 
         blogComment.get().setNeedToVerify(false);
         logger.info("Verification comment success");
+    }
+
+    public Page<BlogComment> convertListToPage(List<BlogComment> blogCommentList, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        int total = blogCommentList.size();
+        int start = Math.toIntExact(pageRequest.getOffset());
+        int end = Math.min((start + pageRequest.getPageSize()), total);
+
+        List<BlogComment> output = new ArrayList<>();
+        if (start <= end) {
+            output = blogCommentList.subList(start, end);
+        }
+        return new PageImpl<>(output, pageRequest, total);
     }
 }
