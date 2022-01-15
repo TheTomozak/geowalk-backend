@@ -156,13 +156,13 @@ public class BlogCommentService {
             }
         }
 
-        if (request.getContent() != null) {
+        if (!request.getContent().equals(blogComment.get().getContent())) {
             if (!request.getContent().isBlank()) {
                 blogComment.get().setContent(request.getContent());
             }
         }
 
-        if (request.getRating() != null) {
+        if (!request.getRating().equals(blogComment.get().getRating())) {
             if (request.getRating() < 1 || request.getRating() > 5) {
                 logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_COMMENT_FAILED), dict.getDict().get(BLOG_COMMENT_INVALID_RATING_VALUE));
                 throw new BadRequestException(dict.getDict().get(BLOG_COMMENT_INVALID_RATING_VALUE));
