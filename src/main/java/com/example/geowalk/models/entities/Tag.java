@@ -10,6 +10,8 @@ public class Tag extends EntityBase {
     @Column(nullable = false)
     private String name;
 
+    private long occurrenceNumber = 1;
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "blog_posts_tags",
             joinColumns = {@JoinColumn(name = "tag_id")},
@@ -37,5 +39,13 @@ public class Tag extends EntityBase {
 
     public void setBlogPosts(List<BlogPost> blogPosts) {
         this.blogPosts = blogPosts;
+    }
+
+    public long getOccurrenceNumber() {
+        return occurrenceNumber;
+    }
+
+    public void setOccurrenceNumber(long occurrenceNumber) {
+        this.occurrenceNumber = occurrenceNumber;
     }
 }

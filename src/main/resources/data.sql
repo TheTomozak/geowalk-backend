@@ -100,26 +100,26 @@ values ('Ciekawa trasa!', '2021-09-15', 4, 1, true, 1, false),                  
        ('Z artykulu mozna wyczytac ze warto przyjechac. Bilety juz kupione.', '2021-10-02', 5, 8, true, 6, false); --32
 
 
-insert into tag(name, visible)
-values ('Wycieczka', true),    --1
-       ('Ciekawa', true),      --2
-       ('Krajoznawcze', true), --3
-       ('Krotka', true),       --4
-       ('Dluga', true),        --5
+insert into tag(name, visible, occurrence_number)
+values ('Wycieczka', true, 3),    --1
+       ('Ciekawa', true, 5),      --2
+       ('Krajoznawcze', true, 3), --3
+       ('Krotka', true, 2),       --4
+       ('Dluga', true, 3),        --5
 
-       ('Warszawa', true),     --6
-       ('Polska', true),       --7
-       ('Zamki', true),        --8
+       ('Warszawa', true, 2),     --6
+       ('Polska', true, 2),       --7
+       ('Zamki', true, 1),        --8
 
-       ('Egipt', true),        --9
-       ('Kair', true),         --10
-       ('Gorace kraje', true), --11
+       ('Egipt', true, 1),        --9
+       ('Kair', true, 1),         --10
+       ('Gorace kraje', true, 1), --11
 
-       ('USA', true),          --12
-       ('Stany', true),        --13
-       ('LA', true),           --14
+       ('USA', true, 2),          --12
+       ('Stany', true, 2),        --13
+       ('LA', true, 1),           --14
 
-       ('Watykan', true); --15
+       ('Watykan', true, 1); --15
 
 
 insert into BLOG_POSTS_TAGS(TAG_ID, BLOG_POST_ID)

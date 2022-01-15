@@ -78,7 +78,7 @@ public class BlogPostService {
             logger.error("{}{}", dict.getDict().get(LOGGER_GET_POST_FAILED), dict.getDict().get(BLOG_POST_BAD_REQUEST));
             throw new BadRequestException(dict.getDict().get(BLOG_POST_BAD_REQUEST));
         }
-        Page<BlogPost> blogPostPage = blogPostRepo.findBlogPostsByVisibleTrueAndNeedToVerifyFalse(PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "creationDateTime")));
+        Page<BlogPost> blogPostPage = blogPostRepo.findBlogPostsByVisibleTrueAndNeedToVerifyFalse(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creationDateTime")));
         return convertToBlogPostShortResDto(blogPostPage);
     }
 
