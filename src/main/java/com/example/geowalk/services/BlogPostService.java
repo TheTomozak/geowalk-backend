@@ -3,10 +3,10 @@ package com.example.geowalk.services;
 import com.example.geowalk.exceptions.BadRequestException;
 import com.example.geowalk.exceptions.ForbiddenException;
 import com.example.geowalk.exceptions.NotFoundException;
-import com.example.geowalk.exceptions.UnauthorizedException;
 import com.example.geowalk.models.dto.requests.BlogPostReqDto;
 import com.example.geowalk.models.dto.requests.BlogPostVerificationReqDto;
-import com.example.geowalk.models.dto.responses.BlogCommentResDto;
+import com.example.geowalk.models.dto.requests.TravelRouteReqDto;
+import com.example.geowalk.models.dto.requests.TravelStopReqDto;
 import com.example.geowalk.models.dto.responses.BlogPostResDto;
 import com.example.geowalk.models.dto.responses.BlogPostShortResDto;
 import com.example.geowalk.models.entities.*;
@@ -45,6 +45,7 @@ public class BlogPostService {
 
     private final TravelStopService travelStopService;
     private final TravelRouteService travelRouteService;
+    private final TagService tagService;
 
     private final BlogPostRepo blogPostRepo;
     private final UserRepo userRepo;
@@ -57,6 +58,7 @@ public class BlogPostService {
                            TravelStopService travelStopService,
                            TravelRouteService travelRouteService,
                            SwearWordsFilter swearWordsFilter,
+                           TagService tagService,
                            UserRepo userRepo,
                            TagRepo tagRepo) {
         this.mapper = mapper;
@@ -66,6 +68,7 @@ public class BlogPostService {
         this.travelStopService = travelStopService;
         this.travelRouteService = travelRouteService;
         this.swearWordsFilter = swearWordsFilter;
+        this.tagService = tagService;
         this.userRepo = userRepo;
         this.tagRepo = tagRepo;
     }
@@ -209,7 +212,7 @@ public class BlogPostService {
 
         // TODO: 05.12.2021 Dodawanie zdjęć
 
-        if (swearWordsFilter.hasSwearWord(request.getContent()) || swearWordsFilter.hasSwearWord(request.getTitle())) {
+        if (swearWordsFilter.hasSwearWord(request.getContent()) || swearWordsFilter.hasSwearWord(request.getTitle()) || swearWordsFilter.hasSwearWord(request.getShortDescription())) {
             blogPost.setNeedToVerify(true);
         }
 
@@ -217,9 +220,72 @@ public class BlogPostService {
         logger.info(blogPost.isNeedToVerify() ? dict.getDict().get(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST) : "Creating post success");
     }
 
+    public void updateBlogPost(Long blogPostId, BlogPostReqDto request) {
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
+        if (loggedUser.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_POST_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
+            throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
+        }
+
+        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
+        if (blogPost.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_POST_FAILED), dict.getDict().get(BLOG_POST_NOT_FOUND));
+            throw new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));
+        }
+
+        if (!loggedUser.get().equals(blogPost.get().getUser())) {
+            if (!(loggedUser.get().getRole().equals(Role.ADMIN) || loggedUser.get().getRole().equals(Role.MODERATOR))) {
+                logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_COMMENT_FAILED), dict.getDict().get(BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER));
+                throw new ForbiddenException(dict.getDict().get(BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER));
+            }
+        }
+
+        if (!request.getShortDescription().equals(blogPost.get().getShortDescription())) {
+            if (!request.getShortDescription().isBlank()) {
+                blogPost.get().setShortDescription(request.getShortDescription());
+            }
+        }
+
+        if (!request.getContent().equals(blogPost.get().getContent())) {
+            if (!request.getContent().isBlank()) {
+                blogPost.get().setContent(request.getContent());
+            }
+        }
+
+        if (!request.getTitle().equals(blogPost.get().getTitle())) {
+            if (!request.getTitle().isBlank()) {
+                blogPost.get().setTitle(request.getTitle());
+            }
+        }
+
+        if (request.getTravelRoutes() != null && request.getTravelStops() != null) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_POST_FAILED), dict.getDict().get(BLOG_POST_BAD_REQUEST));
+            throw new BadRequestException(dict.getDict().get(BLOG_POST_BAD_REQUEST));
+        }
+
+        if (request.getTravelRoutes() != null) {
+            updateBlogPostTravelRoutes(blogPost.get(), request.getTravelRoutes());
+        }
+
+        if (request.getTravelStops() != null) {
+            updateBlogPostTravelStops(blogPost.get(), request.getTravelStops());
+        }
+
+        updateBlogPostTags(blogPost.get(), request.getTagList());
+
+        if (swearWordsFilter.hasSwearWord(request.getTitle()) || swearWordsFilter.hasSwearWord(request.getContent()) || swearWordsFilter.hasSwearWord(request.getShortDescription())) {
+            blogPost.get().setNeedToVerify(true);
+        }
+
+        blogPostRepo.save(blogPost.get());
+        logger.info(blogPost.get().isNeedToVerify() ? dict.getDict().get(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST) : "Updating post success");
+    }
+
+
     public List<BlogPostShortResDto> getBlogPostsToVerify() {
         Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_GET_POST_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
             throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
         }
 
@@ -288,4 +354,33 @@ public class BlogPostService {
         return new PageImpl<>(output, pageRequest, total);
     }
 
+    private void updateBlogPostTravelRoutes(BlogPost blogPost, List<TravelRouteReqDto> travelRoutes) {
+        blogPost.getTravelRoutes().clear();
+        blogPost.setTravelRoutes(new ArrayList<>());
+        for (TravelRouteReqDto request : travelRoutes) {
+            TravelRoute travelRoute = travelRouteService.getOrCreateTravelRoute(request);
+            blogPost.getTravelRoutes().add(travelRoute);
+        }
+        blogPostRepo.save(blogPost);
+    }
+
+    private void updateBlogPostTravelStops(BlogPost blogPost, List<TravelStopReqDto> travelStops) {
+        blogPost.getTravelStops().clear();
+        blogPost.setTravelStops(new ArrayList<>());
+        for (TravelStopReqDto request : travelStops) {
+            TravelStop travelStop = travelStopService.getOrCreateTravelStop(request);
+            blogPost.getTravelStops().add(travelStop);
+        }
+        blogPostRepo.save(blogPost);
+    }
+
+    private void updateBlogPostTags(BlogPost blogPost, List<String> tagList) {
+        blogPost.getTags().clear();
+        blogPost.setTags(new ArrayList<>());
+        for (String tagString : tagList) {
+            Tag tag = tagService.getOrCreateTag(tagString);
+            blogPost.getTags().add(tag);
+        }
+        blogPostRepo.save(blogPost);
+    }
 }

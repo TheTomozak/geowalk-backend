@@ -12,10 +12,14 @@ import com.example.geowalk.utils.messages.MessagesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import static com.example.geowalk.utils.messages.MessageKeys.*;
+import java.util.Optional;
+
+import static com.example.geowalk.utils.messages.MessageKeys.BLOG_POST_BAD_REQUEST;
+import static com.example.geowalk.utils.messages.MessageKeys.LOGGER_CREATE_TRAVEL_ROUTE_FAILED;
 
 @Service
 @Transactional
@@ -26,16 +30,13 @@ public class TravelRouteService {
 
     private final TravelStopService travelStopService;
     private final TravelRouteRepo travelRouteRepo;
-    private final TravelStopRepo travelStopRepo;
 
     public TravelRouteService(MessagesUtil dict,
                               TravelStopService travelStopService,
-                              TravelRouteRepo travelRouteRepo,
-                              TravelStopRepo travelStopRepo) {
+                              TravelRouteRepo travelRouteRepo) {
         this.dict = dict;
         this.travelStopService = travelStopService;
         this.travelRouteRepo = travelRouteRepo;
-        this.travelStopRepo = travelStopRepo;
     }
 
     public TravelRoute createTravelRoute(TravelRouteReqDto request){
@@ -45,9 +46,9 @@ public class TravelRouteService {
         }
 
         TravelRoute travelRoute = new TravelRoute(
-            request.getName(),
-            request.getDifficulty(),
-            request.getDescription()
+                request.getName(),
+                request.getDifficulty(),
+                request.getDescription()
         );
 
         List<TravelStop> travelStops = travelStopService.getOrCreateTravelStopsByLocation(new ArrayList<>(request.getTravelStops()));
@@ -55,5 +56,14 @@ public class TravelRouteService {
         travelRouteRepo.save(travelRoute);
         logger.info("Creating travel route success");
         return travelRoute;
+    }
+
+    public TravelRoute getOrCreateTravelRoute(TravelRouteReqDto request) {
+        Optional<TravelRoute> travelRoute = travelRouteRepo.findByNameAndDifficultyAndDescription(request.getName(), request.getDifficulty(), request.getDescription());
+        if (travelRoute.isEmpty()) {
+            return createTravelRoute(request);
+        } else {
+            return travelRoute.get();
+        }
     }
 }

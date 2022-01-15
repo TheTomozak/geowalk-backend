@@ -1,7 +1,6 @@
 package com.example.geowalk.services;
 
 import com.example.geowalk.exceptions.BadRequestException;
-import com.example.geowalk.exceptions.NotFoundException;
 import com.example.geowalk.models.dto.requests.TravelStopReqDto;
 import com.example.geowalk.models.entities.TravelStop;
 import com.example.geowalk.models.repositories.TravelStopRepo;
@@ -24,8 +23,6 @@ public class TravelStopService {
     private static final Logger logger = LoggerFactory.getLogger(TravelStopService.class);
     private final MessagesUtil dict;
     private final TravelStopRepo travelStopRepo;
-
-    private final String NOT_FOUND_BLOG_POST = "Travel stop with given id not found";
 
     public TravelStopService(MessagesUtil dict, TravelStopRepo travelStopRepo) {
         this.dict = dict;
@@ -91,5 +88,32 @@ public class TravelStopService {
         travelStopRepo.saveAll(newTravelStops);
         existsTravelStops.addAll(newTravelStops);
         return existsTravelStops;
+    }
+
+    public TravelStop getOrCreateTravelStop(TravelStopReqDto request) {
+        String country = request.getCountry();
+        String city = request.getCity();
+        String street = request.getStreet();
+
+        if (city == null && street != null) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_TRAVEL_STOP_FAILED), dict.getDict().get(MISSING_CITY_VALUE));
+            throw new BadRequestException(dict.getDict().get(MISSING_CITY_VALUE));
+        }
+
+        Optional<TravelStop> travelStop = travelStopRepo.findByVisibleIsTrueAndCountryAndCityAndStreet(country, city, street);
+        if (travelStop.isPresent()) {
+            return travelStop.get();
+        } else {
+            TravelStop newTravelStop = new TravelStop(
+                    request.getName(),
+                    request.getLatitude(),
+                    request.getLongitude(),
+                    country,
+                    city,
+                    street
+            );
+            travelStopRepo.save(newTravelStop);
+            return newTravelStop;
+        }
     }
 }
