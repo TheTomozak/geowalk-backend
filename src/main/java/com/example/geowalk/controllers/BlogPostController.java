@@ -91,6 +91,13 @@ public class BlogPostController {
         blogPostService.createBlogPost(request);
     }
 
+    @PutMapping("/{blogPostId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'MODERATOR', 'ADMIN')")
+    public void updateBlogPost(@PathVariable("blogPostId") Long blogPostId, @RequestBody BlogPostReqDto request) {
+        logger.info("PUT[api/blogs/{}] Updating blog post with id {}", blogPostId, blogPostId);
+        blogPostService.updateBlogPost(blogPostId, request);
+    }
+
     /*
      ***********************
      * Moderator endpoints *

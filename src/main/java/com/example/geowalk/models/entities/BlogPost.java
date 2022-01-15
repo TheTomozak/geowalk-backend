@@ -48,7 +48,7 @@ public class BlogPost extends EntityBase {
     @OneToMany(mappedBy = "blogPost", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private List<Image> images = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "blog_posts_tags",
             joinColumns = {@JoinColumn(name = "blog_post_id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id")})
