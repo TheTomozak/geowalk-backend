@@ -140,19 +140,19 @@ public class UserService {
             }
         }
 
-        if (request.getFirstName() != null) {
+        if (!request.getFirstName().equals(userToUpdate.get().getFirstName())) {
             if (!request.getFirstName().isBlank()) {
                 userToUpdate.get().setFirstName(request.getFirstName());
             }
         }
 
-        if (request.getLastName() != null) {
+        if (!request.getLastName().equals(userToUpdate.get().getLastName())) {
             if (!request.getLastName().isBlank()) {
                 userToUpdate.get().setLastName(request.getLastName());
             }
         }
 
-        if (request.getEmail() != null) {
+        if (!request.getEmail().equals(userToUpdate.get().getEmail())) {
             if (!isEmailUnique(request.getEmail())) {
                 logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_USER_FAILED), dict.getDict().get(EMAIL_ALREADY_IN_USE));
                 throw new NotAcceptableException(dict.getDict().get(EMAIL_ALREADY_IN_USE));
