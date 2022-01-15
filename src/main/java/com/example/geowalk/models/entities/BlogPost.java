@@ -11,7 +11,7 @@ public class BlogPost extends EntityBase {
     @Column(nullable = false, length = 200)
     private String shortDescription;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition =  "NVARCHAR(MAX)")
     private String content;
 
     @Column(nullable = false)
