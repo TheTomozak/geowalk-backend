@@ -77,6 +77,14 @@ public class BlogPostController {
         return blogPostService.getLatestBlogPost();
     }
 
+    @GetMapping("/user/{userId}")
+    public Page<BlogPostShortResDto> getUserBlogPosts(@RequestParam(defaultValue = "0") int page,
+                                                      @RequestParam(defaultValue = "5") int size,
+                                                      @PathVariable("userId") Long userId) {
+        logger.info("GET[api/blogs/user/{}] Getting {} blog posts on page {} related to userId {}", userId, size, page, userId);
+        return blogPostService.getUserBlogPosts(page, size, userId);
+    }
+
     @GetMapping("/{blogPostId}")
     public BlogPostResDto getBlogPost(@PathVariable("blogPostId") Long blogPostId) {
         logger.info("GET[api/blogs/{}] Getting blog post with id {}", blogPostId, blogPostId);

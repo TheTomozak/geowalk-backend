@@ -148,6 +148,16 @@ public class BlogPostService {
         return mapper.map(latestBlogPost, BlogPostShortResDto.class);
     }
 
+    public Page<BlogPostShortResDto> getUserBlogPosts(int page, int size, Long userId) {
+        Optional<User> user = userRepo.findByIdAndVisibleIsTrue(userId);
+        if (user.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_GET_POST_FAILED), dict.getDict().get(USER_NOT_FOUND_ID));
+            throw new NotFoundException(dict.getDict().get(USER_NOT_FOUND_ID));
+        }
+        Page<BlogPost> blogPostsPage = blogPostRepo.findBlogPostsByVisibleTrueAndNeedToVerifyFalseAndUserOrderByCreationDateTimeDesc(user.get(), PageRequest.of(page, size));
+        return convertToBlogPostShortResDto(blogPostsPage);
+    }
+
     public BlogPostResDto getBlogPost(Long blogPostId) {
         Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
         if (blogPost.isEmpty()) {

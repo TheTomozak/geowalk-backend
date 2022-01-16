@@ -2,6 +2,7 @@ package com.example.geowalk.models.repositories;
 
 import com.example.geowalk.models.entities.BlogPost;
 import com.example.geowalk.models.entities.Tag;
+import com.example.geowalk.models.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
     Integer countBlogPostsByVisibleTrue();
     List<BlogPost> findBlogPostsByVisibleTrueAndNeedToVerifyTrueOrderByCreationDateTime();
     Optional<BlogPost> findByIdAndVisibleTrueAndNeedToVerifyTrue(Long blogPostId);
+    Page<BlogPost> findBlogPostsByVisibleTrueAndNeedToVerifyFalseAndUserOrderByCreationDateTimeDesc(User user, Pageable pageable);
 
     String query = "SELECT DISTINCT bp.ID, bp.VISIBLE, bp.CONTENT, bp.CREATION_DATE_TIME, " +
             "bp.LAST_EDIT_DATE_TIME, bp.NEED_TO_VERIFY, bp.NUMBER_OF_VISITS, bp.SHORT_DESCRIPTION, " +
