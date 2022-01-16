@@ -1,6 +1,7 @@
 package com.example.geowalk.models.dto.responses;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class BlogPostShortResDto {
 
@@ -20,7 +21,7 @@ public class BlogPostShortResDto {
 
     private UserResDto user;
 
-//    private List<Tag> tagList;
+    private List<TagResDto> tags;
 
 
     public String getTitle() {
@@ -85,5 +86,13 @@ public class BlogPostShortResDto {
 
     public void setRateAverage(Double rateAverage) {
         this.rateAverage = rateAverage;
+    }
+
+    public List<TagResDto> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TagResDto> tags) {
+        this.tags = tags;
     }
 }

@@ -30,7 +30,7 @@ public class BlogPostResDto {
     private Double rateAverage;
 
 //    private List<Image> images;
-//    private List<Tag> tags;
+    private List<TagResDto> tags;
 
 
     public Double getRateAverage() {
@@ -127,5 +127,13 @@ public class BlogPostResDto {
 
     public void setNumberOfVisits(Long numberOfVisits) {
         this.numberOfVisits = numberOfVisits;
+    }
+
+    public List<TagResDto> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TagResDto> tags) {
+        this.tags = tags;
     }
 }
