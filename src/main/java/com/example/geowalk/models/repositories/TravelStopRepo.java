@@ -19,5 +19,5 @@ public interface TravelStopRepo extends JpaRepository<TravelStop, Long> {
 
     List<TravelStop> findAllByVisibleIsTrueAndCountry(String country);
 
-    Optional<TravelStop> findByVisibleIsTrueAndCountryAndCityAndStreet(String country, String city, String street);
+    Optional<TravelStop> findByVisibleIsTrueAndCountryAndLatitudeAndLongitude(String country, double latitude, double longitude);
 }

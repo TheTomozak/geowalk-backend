@@ -62,15 +62,10 @@ public class TravelStopService {
 
         request.forEach(travelStopReq -> {
             String country = travelStopReq.getCountry();
-            String city = travelStopReq.getCity();
-            String street = travelStopReq.getStreet();
+            double latitude = travelStopReq.getLatitude();
+            double longitude = travelStopReq.getLongitude();
 
-            if(city == null && street != null) {
-                logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_TRAVEL_STOP_FAILED), dict.getDict().get(MISSING_CITY_VALUE));
-                throw new BadRequestException(dict.getDict().get(MISSING_CITY_VALUE));
-            }
-
-            Optional<TravelStop> travelStop = travelStopRepo.findByVisibleIsTrueAndCountryAndCityAndStreet(country, city, street);
+            Optional<TravelStop> travelStop = travelStopRepo.findByVisibleIsTrueAndCountryAndLatitudeAndLongitude(country, latitude, longitude);
             if(travelStop.isPresent()){
                 existsTravelStops.add(travelStop.get());
             } else {
@@ -92,15 +87,10 @@ public class TravelStopService {
 
     public TravelStop getOrCreateTravelStop(TravelStopReqDto request) {
         String country = request.getCountry();
-        String city = request.getCity();
-        String street = request.getStreet();
+        double latitude = request.getLatitude();
+        double longitude = request.getLongitude();
 
-        if (city == null && street != null) {
-            logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_TRAVEL_STOP_FAILED), dict.getDict().get(MISSING_CITY_VALUE));
-            throw new BadRequestException(dict.getDict().get(MISSING_CITY_VALUE));
-        }
-
-        Optional<TravelStop> travelStop = travelStopRepo.findByVisibleIsTrueAndCountryAndCityAndStreet(country, city, street);
+        Optional<TravelStop> travelStop = travelStopRepo.findByVisibleIsTrueAndCountryAndLatitudeAndLongitude(country, latitude, longitude);
         if (travelStop.isPresent()) {
             return travelStop.get();
         } else {
@@ -109,8 +99,8 @@ public class TravelStopService {
                     request.getLatitude(),
                     request.getLongitude(),
                     country,
-                    city,
-                    street
+                    request.getCity(),
+                    request.getStreet()
             );
             travelStopRepo.save(newTravelStop);
             return newTravelStop;
