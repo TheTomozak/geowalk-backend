@@ -35,28 +35,28 @@ public class MessagesUtil {
 
             put(LOGGER_CREATE_TRAVEL_ROUTE_FAILED, "Creating travel route failed");
 
-            put(USER_NOT_FOUND_ID, "User with given id not found");
-            put(USER_NOT_FOUND_EMAIL, "User with given email not found");
-            put(USER_NOT_AUTHORIZED, "User is not authenticated/authorized");
-            put(USER_BLOCKED_OR_DELETED, "User already deleted/blocked");
+            put(USER_NOT_FOUND_ID, "Nie znaleziono użytkownika o podanym identyfikatorze");
+            put(USER_NOT_FOUND_EMAIL, "Nie znaleziono użytkownika o podanym emailu");
+            put(USER_NOT_AUTHORIZED, "Brak uprawnień");
+            put(USER_BLOCKED_OR_DELETED, "Użytkownik jest zablokowany/usunięty");
 
-            put(BLOG_COMMENT_NOT_FOUND, "Blog comment with given id not found");
-            put(BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER, "User cannot delete comment others users");
-            put(BLOG_COMMENT_INVALID_RATING_VALUE, "Rating value is invalid");
+            put(BLOG_COMMENT_NOT_FOUND, "Nie znaleziono komentarza o podanym identyfikatorze");
+            put(BLOG_COMMENT_NOT_WRITTEN_BY_THIS_USER, "Użytkownik nie może usuwać komentarza innych użytkowników");
+            put(BLOG_COMMENT_INVALID_RATING_VALUE, "Nieprawidłowa wartość oceny");
 
-            put(BLOG_POST_NOT_FOUND, "BlogPost with given id not found");
-            put(BLOG_POST_BAD_REQUEST, "BlogPost request has bad body");
+            put(BLOG_POST_NOT_FOUND, "Nie znaleziono postu o podanym identyfikatorze");
+            put(BLOG_POST_BAD_REQUEST, "Niepoprawne wypełnione pola dla postu");
 
-            put(EMAIL_ALREADY_IN_USE, "Email is already in use");
-            put(INVALID_RESULT_VALUE, "Invalid result value");
-            put(MISSING_COUNTRY_VALUE, "Missing country value");
-            put(MISSING_CITY_VALUE, "Missing city value");
+            put(EMAIL_ALREADY_IN_USE, "Podany email jest już zajęty");
+            put(INVALID_RESULT_VALUE, "Niepoprawny wynik resultu");
+            put(MISSING_COUNTRY_VALUE, "Brakuje wartości parametru country");
+            put(MISSING_CITY_VALUE, "Brakuje wartości parametru city");
 
-            put(FIELD_CANNOT_BE_BLANK, "Field cannot be empty");
-            put(FIELD_CANNOT_BE_NULL, "Field cannot be null");
+            put(FIELD_CANNOT_BE_BLANK, "Pole nie może być puste");
+            put(FIELD_CANNOT_BE_NULL, "Pole nie może być puste");
 
-            put(SWEAR_WORDS_FILTER_MESSAGE_COMMENT, "Comment moved to verification due to profanity");
-            put(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST, "Blog post moved to verification due to profanity");
+            put(SWEAR_WORDS_FILTER_MESSAGE_COMMENT, "Komentarz przeniesiono do weryfikacji z powodu potencjalnych wulgaryzmów");
+            put(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST, "Post przeniesiono do weryfikacji z powodu potencjalnych wulgaryzmów");
         }};
     }
 
