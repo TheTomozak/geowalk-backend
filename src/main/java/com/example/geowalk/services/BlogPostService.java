@@ -199,9 +199,10 @@ public class BlogPostService {
 
             request.getTagList().forEach(tagReq -> {
                 Optional<Tag> tag = tagRepo.findByNameIgnoreCase(tagReq);
-                if (tag.isPresent())
+                if (tag.isPresent()) {
                     existsTags.add(tag.get());
-                else {
+                    tag.get().setOccurrenceNumber(tag.get().getOccurrenceNumber()+1);
+                } else {
                     newTags.add(new Tag(tagReq));
                 }
             });
@@ -373,12 +374,22 @@ public class BlogPostService {
     }
 
     private void updateBlogPostTags(BlogPost blogPost, List<String> tagList) {
+        List<Tag> oldTags = List.copyOf(blogPost.getTags());
         blogPost.getTags().clear();
         blogPost.setTags(new ArrayList<>());
+        List<Tag> newTags = new ArrayList<>();
         for (String tagString : tagList) {
-            Tag tag = tagService.getOrCreateTag(tagString);
+            Tag tag = tagService.getOrCreateTag(tagString, oldTags);
             blogPost.getTags().add(tag);
+            newTags.add(tag);
         }
+
+        for(Tag oldTag : oldTags) {
+            if(!newTags.contains(oldTag)) {
+                oldTag.setOccurrenceNumber(oldTag.getOccurrenceNumber()-1);
+            }
+        }
+
         blogPostRepo.save(blogPost);
     }
 }

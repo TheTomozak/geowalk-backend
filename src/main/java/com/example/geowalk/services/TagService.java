@@ -27,7 +27,7 @@ public class TagService {
         this.tagRepo = tagRepo;
     }
 
-    public Tag getOrCreateTag(String name) {
+    public Tag getOrCreateTag(String name, List<Tag> oldTags) {
         Optional<Tag> tag = tagRepo.findByNameIgnoreCase(name);
         if (tag.isEmpty()) {
             Tag newTag = new Tag(name);
@@ -35,6 +35,9 @@ public class TagService {
             logger.info("Created new tag with name - {}", name);
             return newTag;
         } else {
+            if(!oldTags.contains(tag.get())){
+                tag.get().setOccurrenceNumber(tag.get().getOccurrenceNumber()+1);
+            }
             return tag.get();
         }
     }

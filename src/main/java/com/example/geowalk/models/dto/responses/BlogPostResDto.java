@@ -30,8 +30,8 @@ public class BlogPostResDto {
     private Double rateAverage;
 
 //    private List<Image> images;
-    private List<TagResDto> tags;
 
+    private List<TagResDto> tags;
 
     public Double getRateAverage() {
         return rateAverage;
