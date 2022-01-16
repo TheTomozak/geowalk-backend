@@ -43,7 +43,7 @@ public class TravelStopResDto {
     }
 
     public void setCountry(String country) {
-        country = country;
+        this.country = country;
     }
 
     public String getCity() {
@@ -51,7 +51,7 @@ public class TravelStopResDto {
     }
 
     public void setCity(String city) {
-        city = city;
+        this.city = city;
     }
 
     public String getStreet() {
@@ -59,6 +59,6 @@ public class TravelStopResDto {
     }
 
     public void setStreet(String street) {
-        street = street;
+        this.street = street;
     }
 }
