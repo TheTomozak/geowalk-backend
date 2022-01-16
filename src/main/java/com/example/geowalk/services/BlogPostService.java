@@ -181,7 +181,7 @@ public class BlogPostService {
         if (request.getTravelRoutes() != null) {
             List<TravelRoute> travelRouteList = new ArrayList<>();
             request.getTravelRoutes().forEach(travelRouteReq -> {
-                if (travelRouteReq.getTravelStops().size() < 2) {
+                if (travelRouteReq.getTravelStops().size() < 1) {
                     logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_POST_FAILED), dict.getDict().get(BLOG_POST_BAD_REQUEST));
                     throw new BadRequestException(dict.getDict().get(BLOG_POST_BAD_REQUEST));
                 }
