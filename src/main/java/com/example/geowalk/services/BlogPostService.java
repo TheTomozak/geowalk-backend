@@ -159,7 +159,7 @@ public class BlogPostService {
         return convertBlogPostToBlogPostResDto(blogPost.get());
     }
 
-    public void createBlogPost(BlogPostReqDto request) {
+    public long createBlogPost(BlogPostReqDto request) {
         Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_CREATE_COMMENT_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
@@ -218,9 +218,10 @@ public class BlogPostService {
 
         blogPostRepo.save(blogPost);
         logger.info(blogPost.isNeedToVerify() ? dict.getDict().get(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST) : "Creating post success");
+        return blogPost.getId();
     }
 
-    public void updateBlogPost(Long blogPostId, BlogPostReqDto request) {
+    public long updateBlogPost(Long blogPostId, BlogPostReqDto request) {
         Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
         if (loggedUser.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_UPDATE_POST_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
@@ -279,6 +280,8 @@ public class BlogPostService {
 
         blogPostRepo.save(blogPost.get());
         logger.info(blogPost.get().isNeedToVerify() ? dict.getDict().get(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST) : "Updating post success");
+
+        return blogPost.get().getId();
     }
 
     public Page<BlogPostShortResDto> getBlogPostsToVerify(int page, int size) {

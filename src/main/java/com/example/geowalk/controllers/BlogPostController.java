@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -86,16 +85,16 @@ public class BlogPostController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('USER', 'MODERATOR', 'ADMIN')")
-    public void createBlogPost(@RequestBody BlogPostReqDto request) {
+    public long createBlogPost(@RequestBody BlogPostReqDto request) {
         logger.info("POST[api/blogs] Creating blog post with title {}", request.getTitle());
-        blogPostService.createBlogPost(request);
+        return blogPostService.createBlogPost(request);
     }
 
     @PutMapping("/{blogPostId}")
     @PreAuthorize("hasAnyAuthority('USER', 'MODERATOR', 'ADMIN')")
-    public void updateBlogPost(@PathVariable("blogPostId") Long blogPostId, @RequestBody BlogPostReqDto request) {
+    public long updateBlogPost(@PathVariable("blogPostId") Long blogPostId, @RequestBody BlogPostReqDto request) {
         logger.info("PUT[api/blogs/{}] Updating blog post with id {}", blogPostId, blogPostId);
-        blogPostService.updateBlogPost(blogPostId, request);
+        return blogPostService.updateBlogPost(blogPostId, request);
     }
 
     /*
