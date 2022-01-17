@@ -9,8 +9,8 @@ public class Image extends EntityBase {
     @Column(nullable = false)
     private String name;
 
-    @Lob
-    private Blob image;
+    @Column(nullable = true)
+    private String url;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private BlogPost blogPost;
@@ -18,10 +18,15 @@ public class Image extends EntityBase {
     public Image() {
     }
 
-    public Image(String name, Blob image) {
+    public Image(String name) {
         this.name = name;
-        this.image = image;
     }
+
+    public Image(String name, String url) {
+        this.name = name;
+        this.url = url;
+    }
+
 
     public String getName() {
         return name;
@@ -31,12 +36,12 @@ public class Image extends EntityBase {
         this.name = name;
     }
 
-    public Blob getImage() {
-        return image;
+    public String getUrl() {
+        return url;
     }
 
-    public void setImage(Blob image) {
-        this.image = image;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public BlogPost getBlogPost() {
