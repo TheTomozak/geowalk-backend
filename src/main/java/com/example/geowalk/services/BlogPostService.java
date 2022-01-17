@@ -169,6 +169,14 @@ public class BlogPostService {
 
     public BlogPostResDto getBlogPost(Long blogPostId) {
         Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
+
+        if(sessionUtil.getLoggedUserUsername() != null) {
+            Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
+            if(loggedUser.isPresent() && (loggedUser.get().getRole().equals(Role.MODERATOR) || loggedUser.get().getRole().equals(Role.MODERATOR))) {
+                blogPost = blogPostRepo.findByIdAndVisibleTrue(blogPostId);
+            }
+        }
+
         if (blogPost.isEmpty()) {
             logger.error("{}{}", dict.getDict().get(LOGGER_GET_POST_FAILED), dict.getDict().get(BLOG_POST_NOT_FOUND));
             throw new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));

@@ -17,6 +17,7 @@ public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
 
     Page<BlogPost> findBlogPostsByVisibleTrueAndNeedToVerifyFalse(Pageable pageable);
     List<BlogPost> findBlogPostsByVisibleTrueAndNeedToVerifyFalse();
+    Optional<BlogPost> findByIdAndVisibleTrue(long id);
     Optional<BlogPost> findByIdAndVisibleTrueAndNeedToVerifyFalse(long id);
     BlogPost findFirstByVisibleTrueOrderByCreationDateTimeDesc();
     Integer countBlogPostsByVisibleTrue();
