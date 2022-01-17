@@ -158,6 +158,15 @@ public class BlogPostService {
         return convertToBlogPostShortResDto(blogPostsPage);
     }
 
+    public Page<BlogPostShortResDto> getBlogPostsRelatedToTag(int page, int size, String searchTag) {
+        Optional<Tag> tag = tagRepo.findByNameIgnoreCase(searchTag);
+        if(tag.isEmpty()) {
+            return Page.empty();
+        }
+        Page<BlogPost> blogPostPage = blogPostRepo.findAllBlogPostByTag(tag.get().getId(), PageRequest.of(page, size));
+        return convertToBlogPostShortResDto(blogPostPage);
+    }
+
     public BlogPostResDto getBlogPost(Long blogPostId) {
         Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
         if (blogPost.isEmpty()) {

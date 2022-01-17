@@ -85,6 +85,14 @@ public class BlogPostController {
         return blogPostService.getUserBlogPosts(page, size, userId);
     }
 
+    @GetMapping("/tag/{searchTag}")
+    public Page<BlogPostShortResDto> getBlogPostsRelatedToTag(@RequestParam(defaultValue = "0") int page,
+                                                              @RequestParam(defaultValue = "5") int size,
+                                                              @PathVariable("searchTag") String searchTag) {
+        logger.info("GET[api/blogs/tag/{}] Getting {} blog posts on page {} related to tag {}", searchTag, size, page, searchTag);
+        return blogPostService.getBlogPostsRelatedToTag(page, size, searchTag);
+    }
+
     @GetMapping("/{blogPostId}")
     public BlogPostResDto getBlogPost(@PathVariable("blogPostId") Long blogPostId) {
         logger.info("GET[api/blogs/{}] Getting blog post with id {}", blogPostId, blogPostId);
