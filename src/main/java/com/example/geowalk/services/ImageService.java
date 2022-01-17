@@ -1,6 +1,6 @@
 package com.example.geowalk.services;
 
-import com.example.geowalk.exceptions.base.BadRequestException;
+import com.example.geowalk.exceptions.BadRequestException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
