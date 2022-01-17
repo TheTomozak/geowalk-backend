@@ -43,7 +43,7 @@ public class BlogPostController {
 
     @GetMapping("/travel-stop")
     public Page<BlogPostShortResDto> getBlogPostsRelatedToTravelStop(@RequestParam(defaultValue = "0") int page,
-                                                                     @RequestParam(defaultValue = "5") int size,
+                                                                     @RequestParam(defaultValue = "3") int size,
                                                                      @RequestParam String country,
                                                                      @RequestParam(required = false) String city,
                                                                      @RequestParam(required = false) String street) {
@@ -53,7 +53,7 @@ public class BlogPostController {
 
     @GetMapping("/travel-routes")
     public Page<BlogPostShortResDto> getBlogPostsRelatedToTravelRouteWithTravelStop(@RequestParam(defaultValue = "0") int page,
-                                                                                    @RequestParam(defaultValue = "5") int size,
+                                                                                    @RequestParam(defaultValue = "3") int size,
                                                                                     @RequestParam String country,
                                                                                     @RequestParam(required = false) String city,
                                                                                     @RequestParam(required = false) String street) {
@@ -64,7 +64,7 @@ public class BlogPostController {
 
     @GetMapping("/search")
     public Page<BlogPostShortResDto> getBlogPostsBySearchParam(@RequestParam(defaultValue = "0") int page,
-                                                               @RequestParam(defaultValue = "5") int size,
+                                                               @RequestParam(defaultValue = "3") int size,
                                                                @RequestParam String searchValue) {
         logger.info("GET[api/blogs/search] Getting {} blog posts on page {} found by keyword {}", size, page, searchValue);
         return blogPostService.getBlogPostsBySearchParam(page, size, searchValue);
@@ -79,7 +79,7 @@ public class BlogPostController {
 
     @GetMapping("/user/{userId}")
     public Page<BlogPostShortResDto> getUserBlogPosts(@RequestParam(defaultValue = "0") int page,
-                                                      @RequestParam(defaultValue = "5") int size,
+                                                      @RequestParam(defaultValue = "3") int size,
                                                       @PathVariable("userId") Long userId) {
         logger.info("GET[api/blogs/user/{}] Getting {} blog posts on page {} related to userId {}", userId, size, page, userId);
         return blogPostService.getUserBlogPosts(page, size, userId);
@@ -87,7 +87,7 @@ public class BlogPostController {
 
     @GetMapping("/tag/{searchTag}")
     public Page<BlogPostShortResDto> getBlogPostsRelatedToTag(@RequestParam(defaultValue = "0") int page,
-                                                              @RequestParam(defaultValue = "5") int size,
+                                                              @RequestParam(defaultValue = "3") int size,
                                                               @PathVariable("searchTag") String searchTag) {
         logger.info("GET[api/blogs/tag/{}] Getting {} blog posts on page {} related to tag {}", searchTag, size, page, searchTag);
         return blogPostService.getBlogPostsRelatedToTag(page, size, searchTag);
