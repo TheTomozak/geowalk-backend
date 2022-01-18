@@ -1,5 +1,6 @@
 package com.example.geowalk.controllers;
 
+import com.example.geowalk.exceptions.BadRequestImageException;
 import com.example.geowalk.models.entities.Image;
 import com.example.geowalk.services.ImageService;
 import org.apache.commons.io.IOUtils;
@@ -26,81 +27,21 @@ import java.util.stream.Collectors;
 public class ImageController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
     private final ImageService imageService;
 
     public ImageController(ImageService imageService) {
         this.imageService = imageService;
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile image) {
-        try {
-            imageService.save(image);
-            logger.info("Uploaded the image successfully: " + image.getOriginalFilename());
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            logger.info("Could not upload the image: " + image.getOriginalFilename() + "!");
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Image>> getListImages() {
-        List<Image> imageList = imageService.loadAll().map(path -> {
-            String image = path.getFileName().toString();
-            String url = MvcUriComponentsBuilder
-                    .fromMethodName(ImageController.class, "getImage", path.getFileName().toString()).build().toString();
-
-            return new Image(image, url);
-        }).collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(imageList);
-    }
-
-    @GetMapping("/{imageName:.+}")
+    @PostMapping("/upload/{bPId}")
     @ResponseBody
-    public ResponseEntity<?> getImage(@PathVariable String imageName) throws IOException {
-        Resource image = imageService.load(imageName);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; image=\"" + image.getFilename() + "\"").body(image);
+    public ResponseEntity<?> updateFile(@RequestPart(name = "fileupload")  MultipartFile file, @PathVariable Long bPId) {
+        imageService.save(file, "uploads", bPId);
+        return ResponseEntity.ok().build();
     }
 
-
-    @PostMapping("/up2")
-    @ResponseBody            // 1
-    public String handleFile(@RequestPart(name = "fileupload") MultipartFile file) { // 2
-        File uploadDirectory = new File("uploads");
-        uploadDirectory.mkdirs();    // 3
-
-        File oFile = new File("uploads/" + file.getOriginalFilename());
-        try (OutputStream os = new FileOutputStream(oFile);
-             InputStream inputStream = file.getInputStream()) {
-
-            IOUtils.copy(inputStream, os); // 4
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "Wystąpił błąd podczas przesyłania pliku: " + e.getMessage();
-        }
-
-        return "ok!";
-    }
-
-    @GetMapping("im2/{name}")
-    public ResponseEntity<?> showImage(@PathVariable String name) throws IOException {
-        File file = new File("uploads/" + name);
-//        if (!file.exists()) {
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.valueOf(URLConnection.guessContentTypeFromName(name)))
-//                .body(Files.readAllBytes(file.toPath()));
-
-        InputStream finput = new FileInputStream(file);
-        byte[] imageBytes = new byte[(int)file.length()];
-        finput.read(imageBytes, 0, imageBytes.length);
-        finput.close();
-        String imageStr = Base64.encodeBase64String(imageBytes);
-        return ResponseEntity.ok().body(imageStr);
+    @GetMapping("load/{imageId}")
+    public ResponseEntity<?> showImage(@PathVariable Long imageId) throws IOException {
+        return ResponseEntity.ok().body(imageService.load(imageId));
     }
 }
