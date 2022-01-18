@@ -3,6 +3,7 @@ package com.example.geowalk.models;
 import com.example.geowalk.models.entities.SwearWord;
 import com.example.geowalk.models.repositories.SwearWordRepo;
 import com.example.geowalk.models.repositories.UserRepo;
+import com.example.geowalk.services.ImageService;
 import com.example.geowalk.utils.SwearWordsFilter;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -11,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -21,6 +23,9 @@ public class DbSeeder implements CommandLineRunner {
     private final SwearWordRepo swearWordRepo;
     private final PasswordEncoder passwordEncoder;
     private final SwearWordsFilter swearWordsFilter;
+
+    @Resource
+    private ImageService imageService;
 
     public DbSeeder(UserRepo userRepo, SwearWordRepo swearWordRepo, PasswordEncoder passwordEncoder, SwearWordsFilter swearWordsFilter) {
         this.userRepo = userRepo;
@@ -52,5 +57,8 @@ public class DbSeeder implements CommandLineRunner {
 
         //Load swear words into SwearWordsFilter
         swearWordsFilter.loadSwearWordsFromDatabase();
+
+        //Images init
+        imageService.init();
     }
 }
