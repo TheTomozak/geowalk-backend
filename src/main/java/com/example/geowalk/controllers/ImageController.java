@@ -3,6 +3,7 @@ package com.example.geowalk.controllers;
 import com.example.geowalk.models.entities.Image;
 import com.example.geowalk.services.ImageService;
 import org.apache.commons.io.IOUtils;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -87,12 +88,19 @@ public class ImageController {
     @GetMapping("im2/{name}")
     public ResponseEntity<?> showImage(@PathVariable String name) throws IOException {
         File file = new File("uploads/" + name);
-        if (!file.exists()) {
-            return ResponseEntity.notFound().build();
-        }
+//        if (!file.exists()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        return ResponseEntity.ok()
+//                .contentType(MediaType.valueOf(URLConnection.guessContentTypeFromName(name)))
+//                .body(Files.readAllBytes(file.toPath()));
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(URLConnection.guessContentTypeFromName(name)))
-                .body(Files.readAllBytes(file.toPath()));
+        InputStream finput = new FileInputStream(file);
+        byte[] imageBytes = new byte[(int)file.length()];
+        finput.read(imageBytes, 0, imageBytes.length);
+        finput.close();
+        String imageStr = Base64.encodeBase64String(imageBytes);
+        return ResponseEntity.ok().body(imageStr);
     }
 }
