@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/image")
+@RequestMapping("api/images")
 public class ImageController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -40,7 +40,7 @@ public class ImageController {
         }
     }
 
-    @GetMapping("/images")
+    @GetMapping
     public ResponseEntity<List<Image>> getListImages() {
         List<Image> imageList = imageService.loadAll().map(path -> {
             String image = path.getFileName().toString();
@@ -52,7 +52,7 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.OK).body(imageList);
     }
 
-    @GetMapping("/images/{imageName:.+}")
+    @GetMapping("/{imageName:.+}")
     @ResponseBody
     public ResponseEntity<?> getImage(@PathVariable String imageName) throws IOException {
         Resource image = imageService.load(imageName);
