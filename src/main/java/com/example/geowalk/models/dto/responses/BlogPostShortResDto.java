@@ -23,6 +23,15 @@ public class BlogPostShortResDto {
 
     private List<TagResDto> tags;
 
+    private Long imageId;
+
+    public Long getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(Long imageId) {
+        this.imageId = imageId;
+    }
 
     public String getTitle() {
         return title;
