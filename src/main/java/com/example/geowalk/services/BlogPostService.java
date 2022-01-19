@@ -145,7 +145,11 @@ public class BlogPostService {
 
     public BlogPostShortResDto getLatestBlogPost() {
         BlogPost latestBlogPost = blogPostRepo.findFirstByVisibleTrueOrderByCreationDateTimeDesc();
-        return mapper.map(latestBlogPost, BlogPostShortResDto.class);
+        BlogPostShortResDto map = mapper.map(latestBlogPost, BlogPostShortResDto.class);
+        if(latestBlogPost.getImages().stream().findFirst().orElse(null) != null){
+            map.setImageId(latestBlogPost.getImages().stream().findFirst().get().getId());
+        }
+        return map;
     }
 
     public Page<BlogPostShortResDto> getUserBlogPosts(int page, int size, Long userId) {
