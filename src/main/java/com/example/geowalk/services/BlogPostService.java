@@ -160,10 +160,11 @@ public class BlogPostService {
 
     public Page<BlogPostShortResDto> getBlogPostsRelatedToTag(int page, int size, String searchTag) {
         Optional<Tag> tag = tagRepo.findByNameIgnoreCase(searchTag);
-        if(tag.isEmpty()) {
+        if (tag.isEmpty()) {
             return Page.empty();
         }
-        Page<BlogPost> blogPostPage = blogPostRepo.findAllBlogPostByTag(tag.get().getId(), PageRequest.of(page, size));
+        List<BlogPost> blogPosts = blogPostRepo.findAllBlogPostByTag(tag.get().getId());
+        Page<BlogPost> blogPostPage = convertListToPage(blogPosts, page, size);
         return convertToBlogPostShortResDto(blogPostPage);
     }
 

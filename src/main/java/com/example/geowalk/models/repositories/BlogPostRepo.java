@@ -44,5 +44,5 @@ public interface BlogPostRepo extends JpaRepository<BlogPost, Long> {
             "WHERE TAG_ID = :tagId " +
             "ORDER BY CREATION_DATE_TIME DESC";
     @Query(value = findAllBlogPostByTagQuery, nativeQuery = true)
-    Page<BlogPost> findAllBlogPostByTag(@Param("tagId") Long tagId, Pageable pageable);
+    List<BlogPost> findAllBlogPostByTag(@Param("tagId") Long tagId);
 }
