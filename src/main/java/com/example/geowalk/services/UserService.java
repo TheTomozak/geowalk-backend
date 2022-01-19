@@ -197,7 +197,7 @@ public class UserService {
             throw new NotFoundException(dict.getDict().get(USER_NOT_FOUND_ID));
         }
 
-        Role tmp = null;
+        Role tmp;
         switch (role) {
             case "USER":
                 tmp = Role.USER;
