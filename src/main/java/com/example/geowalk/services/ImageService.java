@@ -29,14 +29,17 @@ public class ImageService {
     }
 
     public Image save(MultipartFile image, String folderName, Long idBlogPost) {
-        File uploadDirectory = new File(folderName);
+
+        String imageFolderName = folderName;
+
+        File uploadDirectory = new File(imageFolderName);
         uploadDirectory.mkdirs();
 
         Long idName;
         if(imageRepo.max() == null) idName = 1L;
         else idName = imageRepo.max() + 1;
 
-        File oFile = new File(folderName+"/" + idName+image.getOriginalFilename());
+        File oFile = new File(imageFolderName+"/" + idName+image.getOriginalFilename());
         try (OutputStream os = new FileOutputStream(oFile);
              InputStream inputStream = image.getInputStream()) {
 
@@ -56,7 +59,7 @@ public class ImageService {
 
             Image newImage = new Image();
             newImage.setName(image.getOriginalFilename());
-            newImage.setUrl(folderName+"/"+idName+image.getOriginalFilename());
+            newImage.setUrl(imageFolderName+"/"+idName+image.getOriginalFilename());
 
 
             BlogPost bP = blogPostRepo.findById(idBlogPost).orElseThrow(() -> new BadRequestException("Cannot find BlogPost with id: "+idBlogPost));
