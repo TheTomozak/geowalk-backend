@@ -57,8 +57,5 @@ public class DbSeeder implements CommandLineRunner {
 
         //Load swear words into SwearWordsFilter
         swearWordsFilter.loadSwearWordsFromDatabase();
-
-        //Images init
-        imageService.init();
     }
 }

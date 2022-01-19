@@ -1,76 +1,94 @@
 package com.example.geowalk.services;
 
 import com.example.geowalk.exceptions.BadRequestException;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import com.example.geowalk.exceptions.BadRequestImageException;
+import com.example.geowalk.exceptions.NotFoundException;
+import com.example.geowalk.models.entities.BlogPost;
+import com.example.geowalk.models.entities.Image;
+import com.example.geowalk.models.repositories.BlogPostRepo;
+import com.example.geowalk.models.repositories.ImageRepo;
+import org.apache.commons.io.IOUtils;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 @Service
 public class ImageService {
 
-    private final Path root = Paths.get("uploads");
+    private final ImageRepo imageRepo;
+    private final BlogPostRepo blogPostRepo;
+
     private final String BAD_REQUEST_IMAGE = "Image request has bad body";
 
-    public void init() {
-        if (!Files.exists(root)) {
-            try {
-                Files.createDirectory(root);
-            } catch (IOException e) {
-                throw new RuntimeException("Could not initialize folder for upload!");
-            }
-        }
+    public ImageService(ImageRepo imageRepo, BlogPostRepo blogPostRepo) {
+        this.imageRepo = imageRepo;
+        this.blogPostRepo = blogPostRepo;
     }
 
-    public void save(MultipartFile image) {
-        try {
+    public Image save(MultipartFile image, String folderName, Long idBlogPost) {
+
+        String imageFolderName = folderName;
+
+        File uploadDirectory = new File(imageFolderName);
+        uploadDirectory.mkdirs();
+
+        Long idName;
+        if(imageRepo.max() == null) idName = 1L;
+        else idName = imageRepo.max() + 1;
+
+        File oFile = new File(imageFolderName+"/" + idName+image.getOriginalFilename());
+        try (OutputStream os = new FileOutputStream(oFile);
+             InputStream inputStream = image.getInputStream()) {
+
             Pattern png = Pattern.compile(".+\\.png");
             Pattern jpg = Pattern.compile(".+\\.jpg");
             Pattern jpeg = Pattern.compile(".+\\.jpeg");
 
-            if(
+            if (
                     !(png.matcher(image.getOriginalFilename()).matches() ||
-                    jpg.matcher(image.getOriginalFilename()).matches() ||
-                    jpeg.matcher(image.getOriginalFilename()).matches())
-            ){
+                            jpg.matcher(image.getOriginalFilename()).matches() ||
+                            jpeg.matcher(image.getOriginalFilename()).matches())
+            ) {
                 throw new BadRequestException(BAD_REQUEST_IMAGE);
             }
 
-            Files.copy(image.getInputStream(), this.root.resolve(image.getOriginalFilename()));
-        } catch (Exception e) {
-            throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
-        }
-    }
+            IOUtils.copy(inputStream, os);
 
-    public Resource load(String filename) {
-        try {
-            Path file = root.resolve(filename);
-            System.out.println(file);
-            Resource resource = new UrlResource(file.toUri());
+            Image newImage = new Image();
+            newImage.setName(image.getOriginalFilename());
+            newImage.setUrl(imageFolderName+"/"+idName+image.getOriginalFilename());
 
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                throw new RuntimeException("Could not read the file!");
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
-        }
-    }
 
-    public Stream<Path> loadAll() {
-        try {
-            return Files.walk(this.root, 1).filter(path -> !path.equals(this.root)).map(this.root::relativize);
+            BlogPost bP = blogPostRepo.findById(idBlogPost).orElseThrow(() -> new BadRequestException("Cannot find BlogPost with id: "+idBlogPost));
+            newImage.setBlogPost(bP);
+            imageRepo.save(newImage);
+
+            return newImage;
         } catch (IOException e) {
-            throw new RuntimeException("Could not load the files!");
+            throw new BadRequestImageException("Could not store the file. Error: " + e.getMessage());
         }
+    }
+
+    public String load(Long imgId) throws IOException {
+
+        Image image = getImageById(imgId);
+
+        File file = new File(image.getUrl());
+        if (!file.exists())  file = new File("uploads/error.png");
+
+
+        InputStream iS = new FileInputStream(file);
+        byte[] imageBytes = new byte[(int)file.length()];
+        iS.read(imageBytes, 0, imageBytes.length);
+        iS.close();
+        return Base64.encodeBase64String(imageBytes);
+    }
+
+    private Image getImageById(Long imgId){
+        return imageRepo.findById(imgId)
+                .orElseThrow(() -> new NotFoundException("Cannot find Image with id: "+imgId));
     }
 }

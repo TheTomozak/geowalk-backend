@@ -29,7 +29,7 @@ public class BlogPostResDto {
 
     private Double rateAverage;
 
-//    private List<Image> images;
+    private List<ImageResponse> images;
 
     private List<TagResDto> tags;
 
@@ -135,5 +135,13 @@ public class BlogPostResDto {
 
     public void setTags(List<TagResDto> tags) {
         this.tags = tags;
+    }
+
+    public List<ImageResponse> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ImageResponse> images) {
+        this.images = images;
     }
 }
