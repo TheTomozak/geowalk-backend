@@ -93,6 +93,46 @@ values ('Najlepsza wycieczka 1 dniowa - Warszawa', 'wycieczka 1 dniowa, 3 najlep
 <p style="text-align: center;"><br />The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty. The Getty.&nbsp;</p>', '2021-06-09', null, 3, true, 66, false),                                                                          --5
        ('Calgarioskie Kasyno', 'Najwieksze kasyno w Calgarach', '<p style="text-align: center;"><span style="text-decoration: line-through;"><sup>Cowboys Casino</sup></span><br />Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. <span style="background-color: #b96ad9;">Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino. Cowboys Casino.&nbsp;</span></p>', '2021-08-10', null, 4, true, 7, false); --6
 
+insert into image (ID,VISIBLE,NAME,URL,BLOG_POST_ID)
+values (1, true, '11.jpg', 'uploads/11.jpg', 1),
+       (2, true, '22.jpg', 'uploads/22.jpg', 1),
+       (3, true, '33.jpg', 'uploads/33.jpg', 1),
+       (4, true, '44.jpg', 'uploads/44.jpg', 1),
+       (5, true, '55.jpg', 'uploads/55.jpg', 1),
+       (6, true, '66.jpg', 'uploads/66.jpg', 1),
+       (7, true, '77.jpg', 'uploads/77.jpg', 2),
+       (8, true, '88.jpg', 'uploads/88.jpg', 2),
+       (9, true, '99.jpg', 'uploads/99.jpg', 2),
+       (10, true, '1010.jpg', 'uploads/1010.jpg', 2),
+       (11, true, '1111.jpg', 'uploads/1111.jpg', 2),
+       (12, true, '1212.png', 'uploads/1212.png', 2),
+       (13, true, '1313.png', 'uploads/1313.png', 3),
+       (14, true, '1414.jpg', 'uploads/1414.jpg', 3),
+       (15, true, '1515.jpg', 'uploads/1515.jpg', 3),
+       (16, true, '1616.jpg', 'uploads/1616.jpg', 3),
+       (17, true, '1717.jpg', 'uploads/1717.jpg', 3),
+       (18, true, '1818.png', 'uploads/1818.png', 3),
+       (19, true, '1919.png', 'uploads/1919.png', 4),
+       (20, true, '2020.png', 'uploads/2020.png', 4),
+       (21, true, '2121.png', 'uploads/2121.png', 4),
+       (22, true, '2222.png', 'uploads/2222.png', 4),
+       (23, true, '2323.png', 'uploads/2323.png', 4),
+       (24, true, '2424.png', 'uploads/2424.png', 4),
+       (25, true, '2525.png', 'uploads/2525.png', 5),
+       (26, true, '2626.png', 'uploads/2626.png', 5),
+       (27, true, '2727.png', 'uploads/2727.png', 5),
+       (28, true, '2828.png', 'uploads/2828.png', 5),
+       (29, true, '2929.png', 'uploads/2929.png', 5),
+       (30, true, '3030.png', 'uploads/3030.png', 5),
+       (31, true, '3131.png', 'uploads/3131.png', 6),
+       (32, true, '3232.png', 'uploads/3232.png', 6),
+       (33, true, '3333.png', 'uploads/3333.png', 6),
+       (34, true, '3434.png', 'uploads/3434.png', 6),
+       (35, true, '3535.png', 'uploads/3535.png', 6),
+       (36, true, '3636.png', 'uploads/3636.png', 6),
+       (37, true, '3737.png', 'uploads/3737.png', 3),
+       (38, true, '3838.png', 'uploads/3838.png', 5);
+
 insert into blog_comment(content, creation_date_time, rating, user_id, visible, blog_post_id, need_to_verify)
 values ('Ciekawa trasa!', '2021-09-15', 4, 1, true, 1, false),                        --1
        ('Duzo atrakcji, a trampoliny - SUPER', '2021-11-10', 5, 2, true, 2, false),   --2
