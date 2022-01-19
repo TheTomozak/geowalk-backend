@@ -113,6 +113,13 @@ public class BlogPostController {
         return blogPostService.updateBlogPost(blogPostId, request);
     }
 
+    @DeleteMapping("/{blogPostId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'MODERATOR', 'ADMIN')")
+    public void deleteBlogPost(@PathVariable("blogPostId") long blogPostId) {
+        logger.info("DELETE[api/blogs/{}] Deleting blog post with id {}", blogPostId, blogPostId);
+        blogPostService.deleteBlogPost(blogPostId);
+    }
+
     /*
      ***********************
      * Moderator endpoints *

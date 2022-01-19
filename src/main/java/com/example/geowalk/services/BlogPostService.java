@@ -3,6 +3,7 @@ package com.example.geowalk.services;
 import com.example.geowalk.exceptions.BadRequestException;
 import com.example.geowalk.exceptions.ForbiddenException;
 import com.example.geowalk.exceptions.NotFoundException;
+import com.example.geowalk.exceptions.UnauthorizedException;
 import com.example.geowalk.models.dto.requests.BlogPostReqDto;
 import com.example.geowalk.models.dto.requests.BlogPostVerificationReqDto;
 import com.example.geowalk.models.dto.requests.TravelRouteReqDto;
@@ -173,12 +174,14 @@ public class BlogPostService {
     }
 
     public BlogPostResDto getBlogPost(Long blogPostId) {
-        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
+        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId); ;
 
         if(sessionUtil.getLoggedUserUsername() != null) {
             Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
-            if(loggedUser.isPresent() && (loggedUser.get().getRole().equals(Role.MODERATOR) || loggedUser.get().getRole().equals(Role.MODERATOR))) {
+            if(loggedUser.isPresent() && (loggedUser.get().getRole().equals(Role.MODERATOR) || loggedUser.get().getRole().equals(Role.ADMIN))) {
                 blogPost = blogPostRepo.findByIdAndVisibleTrue(blogPostId);
+            } else {
+                blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
             }
         }
 
@@ -315,6 +318,28 @@ public class BlogPostService {
         logger.info(blogPost.get().isNeedToVerify() ? dict.getDict().get(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST) : "Updating post success");
 
         return blogPost.get().getId();
+    }
+
+    public void deleteBlogPost(long blogPostId) {
+        Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
+        if(loggedUser.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_DELETE_POST_FAILED), dict.getDict().get(USER_BLOCKED_OR_DELETED));
+            throw new NotFoundException(dict.getDict().get(USER_BLOCKED_OR_DELETED));
+        }
+
+        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
+        if(blogPost.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_DELETE_POST_FAILED), dict.getDict().get(BLOG_POST_NOT_FOUND));
+            throw new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));
+        }
+
+        if(loggedUser.get().getRole().equals(Role.USER) && !loggedUser.get().equals(blogPost.get().getUser())) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_DELETE_POST_FAILED), dict.getDict().get(USER_NOT_AUTHORIZED));
+            throw new UnauthorizedException(dict.getDict().get(USER_NOT_AUTHORIZED));
+        }
+
+        blogPost.get().setVisible(false);
+        logger.info("Delete blog post success");
     }
 
     public Page<BlogPostShortResDto> getBlogPostsToVerify(int page, int size) {
