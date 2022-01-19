@@ -170,12 +170,14 @@ public class BlogPostService {
     }
 
     public BlogPostResDto getBlogPost(Long blogPostId) {
-        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
+        Optional<BlogPost> blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId); ;
 
         if(sessionUtil.getLoggedUserUsername() != null) {
             Optional<User> loggedUser = userRepo.findByEmailAndVisibleIsTrue(sessionUtil.getLoggedUserUsername());
-            if(loggedUser.isPresent() && (loggedUser.get().getRole().equals(Role.MODERATOR) || loggedUser.get().getRole().equals(Role.MODERATOR))) {
+            if(loggedUser.isPresent() && (loggedUser.get().getRole().equals(Role.MODERATOR) || loggedUser.get().getRole().equals(Role.ADMIN))) {
                 blogPost = blogPostRepo.findByIdAndVisibleTrue(blogPostId);
+            } else {
+                blogPost = blogPostRepo.findByIdAndVisibleTrueAndNeedToVerifyFalse(blogPostId);
             }
         }
 
