@@ -364,6 +364,10 @@ public class BlogPostService {
         return blogPostsPage.map(blogPost -> {
             BlogPostShortResDto blogPostShort = mapper.map(blogPost, BlogPostShortResDto.class);
             blogPostShort.setRateAverage(blogPost.getAverageRate());
+
+            if(blogPost.getImages().stream().findFirst().orElse(null) != null){
+                blogPostShort.setImageId(blogPost.getImages().stream().findFirst().get().getId());
+            }
             return blogPostShort;
         });
     }
