@@ -189,4 +189,30 @@ public class UserService {
         logger.info("Checking if email is unique finished");
         return userRepo.isEmailUnique(email);
     }
+
+    public void assignRole(Long userId, String role) {
+        Optional<User> user = userRepo.findByIdAndVisibleIsTrue(userId);
+        if(user.isEmpty()) {
+            logger.error("{}{}", dict.getDict().get(LOGGER_ASSIGN_ROLE_FAILED), dict.getDict().get(USER_NOT_FOUND_ID));
+            throw new NotFoundException(dict.getDict().get(USER_NOT_FOUND_ID));
+        }
+
+        Role tmp = null;
+        switch (role) {
+            case "USER":
+                tmp = Role.USER;
+                break;
+            case "MODERATOR":
+                tmp = Role.MODERATOR;
+                break;
+            case "ADMIN":
+                tmp = Role.ADMIN;
+                break;
+            default:
+                logger.error("{}{}", dict.getDict().get(LOGGER_ASSIGN_ROLE_FAILED), dict.getDict().get(INVALID_ROLE_VALUE));
+                throw new BadRequestException(dict.getDict().get(INVALID_ROLE_VALUE));
+        }
+
+        user.get().setRole(tmp);
+    }
 }

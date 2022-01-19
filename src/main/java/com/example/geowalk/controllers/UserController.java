@@ -77,4 +77,11 @@ public class UserController {
         logger.info("POST[api/users/emailCheck] Checking if email {} is unique", email);
         return userService.isEmailUnique(email);
     }
+
+    @PostMapping("/{userId}/assignRole")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void assignRole(@PathVariable("userId") Long userId, @RequestParam(defaultValue = "user") String role) {
+        logger.info("POST[api/users/{}/assignRole] Assigning role {} to user with id {}", userId, role, userId);
+        userService.assignRole(userId, role);
+    }
 }

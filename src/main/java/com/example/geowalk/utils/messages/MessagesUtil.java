@@ -18,6 +18,7 @@ public class MessagesUtil {
             put(LOGGER_CREATE_USER_FAILED, "Create user failed: ");
             put(LOGGER_UPDATE_USER_FAILED, "Update user failed: ");
             put(LOGGER_DELETE_USER_FAILED, "Delete user failed: ");
+            put(LOGGER_ASSIGN_ROLE_FAILED, "Assign user role failed: ");
 
             put(LOGGER_GET_POST_FAILED, "Getting posts failed: ");
             put(LOGGER_CREATE_POST_FAILED, "Creating post failed: ");
@@ -54,6 +55,7 @@ public class MessagesUtil {
 
             put(FIELD_CANNOT_BE_BLANK, "Pole nie może być puste");
             put(FIELD_CANNOT_BE_NULL, "Pole nie może być puste");
+            put(INVALID_ROLE_VALUE, "Niepoprawna wartość roli");
 
             put(SWEAR_WORDS_FILTER_MESSAGE_COMMENT, "Komentarz przeniesiono do weryfikacji z powodu potencjalnych wulgaryzmów");
             put(SWEAR_WORDS_FILTER_MESSAGE_BLOG_POST, "Post przeniesiono do weryfikacji z powodu potencjalnych wulgaryzmów");
