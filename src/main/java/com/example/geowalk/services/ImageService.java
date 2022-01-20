@@ -91,4 +91,25 @@ public class ImageService {
         return imageRepo.findById(imgId)
                 .orElseThrow(() -> new NotFoundException("Cannot find Image with id: "+imgId));
     }
+
+    public void delete(Long imageId) {
+        Image image = imageRepo.findById(imageId)
+                .orElseThrow(() -> new NotFoundException("Cannot find image by id:"+imageId));
+
+//        image.setBlogPost(null);
+//        image.setVisible(!image.isVisible());
+
+        try {
+            File file = new File(image.getUrl());
+            if (file.delete()) {
+                System.out.println(file.getName() + " is deleted!");
+            } else {
+                System.out.println("Unable to delete the file.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        imageRepo.delete(image);
+    }
 }
