@@ -172,8 +172,8 @@ public class BlogPost extends EntityBase {
     }
 
     public Double getAverageRate() {
-        if(blogComments == null) {
-            return 0d;
+        if(blogComments.isEmpty()) {
+            return (double) 0;
         }
         double sum = blogComments.stream().map(BlogComment::getRating).mapToInt(Integer::intValue).sum();
         double values = (double) blogComments.stream().map(BlogComment::getRating).count();
