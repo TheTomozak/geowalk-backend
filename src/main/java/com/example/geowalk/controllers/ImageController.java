@@ -31,4 +31,10 @@ public class ImageController {
     public ResponseEntity<?> showImage(@PathVariable Long imageId) throws IOException {
         return ResponseEntity.ok().body(imageService.load(imageId));
     }
+
+    @DeleteMapping("delete/{imageId}")
+    public ResponseEntity<?> deleteImage(@PathVariable Long imageId){
+        imageService.delete(imageId);
+        return ResponseEntity.ok().build();
+    }
 }
