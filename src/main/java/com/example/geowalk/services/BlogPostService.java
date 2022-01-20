@@ -190,8 +190,12 @@ public class BlogPostService {
             throw new NotFoundException(dict.getDict().get(BLOG_POST_NOT_FOUND));
         }
 
+        BlogPost copyBlogPost = blogPost.get().copy();
+        List<BlogComment> filteredComments = blogPost.get().getBlogComments().stream().filter(EntityBase::isVisible).collect(Collectors.toList());
+
+        copyBlogPost.setBlogComments(filteredComments);
         blogPost.get().setNumberOfVisits(blogPost.get().getNumberOfVisits() + 1);
-        return convertBlogPostToBlogPostResDto(blogPost.get());
+        return convertBlogPostToBlogPostResDto(copyBlogPost);
     }
 
     public long createBlogPost(BlogPostReqDto request) {

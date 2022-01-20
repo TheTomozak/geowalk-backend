@@ -172,10 +172,31 @@ public class BlogPost extends EntityBase {
     }
 
     public Double getAverageRate() {
+        if(blogComments == null) {
+            return 0d;
+        }
         double sum = blogComments.stream().map(BlogComment::getRating).mapToInt(Integer::intValue).sum();
         double values = (double) blogComments.stream().map(BlogComment::getRating).count();
         return sum / values;
     }
 
+
+    public BlogPost copy() {
+        BlogPost newBlogPost = new BlogPost();
+        newBlogPost.setShortDescription(this.shortDescription);
+        newBlogPost.setContent(this.content);
+        newBlogPost.setTitle(this.title);
+        newBlogPost.setCreationDateTime(this.creationDateTime);
+        newBlogPost.setLastEditDateTime(this.lastEditDateTime);
+        newBlogPost.setNeedToVerify(this.needToVerify);
+        newBlogPost.setUser(this.user);
+        newBlogPost.setBlogComments(this.blogComments);
+        newBlogPost.setTravelStops(this.travelStops);
+        newBlogPost.setTravelRoutes(this.travelRoutes);
+        newBlogPost.setImages(this.images);
+        newBlogPost.setTags(this.tags);
+        newBlogPost.setNumberOfVisits(this.numberOfVisits);
+        return newBlogPost;
+    }
 
 }
